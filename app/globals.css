@@ -1,0 +1,256 @@
+:root {
+  --sage-50: #f3f5ef;
+  --sage-100: #e2e8d9;
+  --sage-300: #a9bd97;
+  --sage-500: #5f7a52;
+  --sage-700: #3f5636;
+  --sage-900: #223226;
+
+  --mustard-300: #ecc873;
+  --mustard-500: #d9a441;
+  --mustard-700: #a67322;
+
+  --paper: #fbfaf6;
+  --ink: #223226;
+  --ink-soft: #55655a;
+  --line: #dde3d4;
+
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), serif;
+  font-weight: 600;
+  margin: 0 0 0.4em;
+  color: var(--sage-900);
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
+a {
+  color: var(--sage-700);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.brand {
+  font-family: var(--font-display), serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--sage-900);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 6px 4px;
+  border-bottom: 2px solid transparent;
+}
+
+.nav a:hover {
+  color: var(--sage-700);
+  border-bottom-color: var(--mustard-500);
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card-link {
+  display: block;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+.card-link:hover {
+  border-color: var(--sage-300);
+}
+
+.card-link h2 {
+  margin-bottom: 4px;
+}
+
+.card-link p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.grid-links {
+  display: grid;
+  gap: 14px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.pill-ok {
+  background: var(--sage-100);
+  color: var(--sage-700);
+}
+
+.pill-warn {
+  background: #fbe9d0;
+  color: var(--mustard-700);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: none;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--sage-700);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--sage-900);
+}
+
+.btn-secondary {
+  background: var(--sage-100);
+  color: var(--sage-700);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--ink);
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chip.selected {
+  background: var(--sage-700);
+  border-color: var(--sage-700);
+  color: white;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.day-block {
+  margin-bottom: 24px;
+}
+
+.day-title {
+  font-family: var(--font-display), serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--sage-900);
+  margin-bottom: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row-name {
+  font-weight: 500;
+}
+
+.row-sub {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+input[type="number"] {
+  width: 72px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+}
+
+.empty {
+  color: var(--ink-soft);
+  font-style: italic;
+  padding: 24px 0;
+}
