@@ -31,6 +31,8 @@ export default function RootLayout({ children }) {
             <Link href="/hoy">Hoy</Link>
             <Link href="/menu">Menú</Link>
             <Link href="/inventario">Inventario</Link>
+            <Link href="/compras">Compras</Link>
+            <Link href="/recetas">Recetas</Link>
           </nav>
         </header>
         <main className="page">{children}</main>
