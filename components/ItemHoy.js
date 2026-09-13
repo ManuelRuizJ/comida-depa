@@ -22,14 +22,18 @@ export default function ItemHoy({ item }) {
 
   return (
     <div className="row">
-      <div>
+      <div className="fila-info">
         <div className="row-name">{item.platillos?.nombre}</div>
       </div>
-      <div style={{ display: "flex", gap: 8 }}>
+      <div className="fila-controles">
         {comido ? (
           <span className="pill pill-ok">✓ Comido</span>
         ) : (
-          <button className="btn btn-primary" onClick={() => marcar(true)} disabled={cargando}>
+          <button
+            className="btn btn-primary"
+            onClick={() => marcar(true)}
+            disabled={cargando}
+          >
             Sí, lo comí
           </button>
         )}

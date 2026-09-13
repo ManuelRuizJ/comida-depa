@@ -254,3 +254,237 @@ input[type="number"] {
   font-style: italic;
   padding: 24px 0;
 }
+
+/* ============================================================ */
+/* Estilos de fila reutilizables                                 */
+/* ============================================================ */
+.fila-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fila-controles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ============================================================ */
+/* Formularios                                                   */
+/* ============================================================ */
+.form-field {
+  margin-bottom: 12px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.form-row-2 {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-row-2 .form-field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.ingrediente-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ingrediente-row input,
+.ingrediente-row select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  background: white;
+  min-width: 0;
+}
+
+.ing-nombre {
+  flex: 2;
+}
+
+.ing-cantidad,
+.ing-unidad {
+  flex: 1;
+}
+
+.btn-quitar {
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+
+
+
+/* ============================================================ */
+/* RESPONSIVE — Mobile                                           */
+/* ============================================================ */
+@media (max-width: 640px) {
+  .topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .brand {
+    font-size: 1.1rem;
+  }
+
+  .nav {
+    gap: 14px;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav a {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 6px 2px;
+  }
+
+  .page {
+    padding: 20px 16px 60px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    margin-bottom: 0.5em;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  /* Filas se apilan verticalmente */
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px 0;
+  }
+
+  .fila-info {
+    flex: none;
+  }
+
+  .fila-controles {
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .fila-controles input[type="number"] {
+    width: 88px;
+    padding: 10px 12px;
+    font-size: 1rem;
+  }
+
+  /* Botones y chips más cómodos para el dedo */
+  .btn {
+    padding: 11px 18px;
+    font-size: 0.95rem;
+    min-height: 42px;
+  }
+
+  .chip {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+
+  .chip-row {
+    gap: 6px;
+  }
+
+  .day-block {
+    margin-bottom: 20px;
+  }
+
+  .day-title {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+
+  /* Formulario: inputs ocupan todo el ancho, uno debajo del otro */
+  .form-row-2 {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ingrediente-row {
+    flex-wrap: wrap;
+  }
+
+  .ing-nombre {
+    flex: 1 1 100%;
+  }
+
+  .ing-cantidad,
+  .ing-unidad {
+    flex: 1;
+  }
+
+  .ingrediente-row input,
+  .ingrediente-row select {
+    padding: 10px 12px;
+    font-size: 1rem;
+  }
+}
+
+/* Pantallas muy chicas (iPhone SE) */
+@media (max-width: 380px) {
+  .nav {
+    gap: 10px;
+  }
+
+  .nav a {
+    font-size: 0.85rem;
+  }
+
+  .chip {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .fila-controles input[type="number"] {
+    width: 72px;
+  }
+}

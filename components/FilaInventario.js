@@ -30,25 +30,29 @@ export default function FilaInventario({ item }) {
 
     setGuardado(true);
     setTimeout(() => setGuardado(false), 1500);
-
-    // Trae los datos frescos del servidor
     router.refresh();
   }
 
   return (
     <div className="row">
-      <div>
+      <div className="fila-info">
         <div className="row-name">{item.nombre}</div>
         <div className="row-sub">{item.unidad}</div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span className={`pill ${faltante ? "pill-warn" : "pill-ok"}`}>{item.estado}</span>
+      <div className="fila-controles">
+        <span className={`pill ${faltante ? "pill-warn" : "pill-ok"}`}>
+          {item.estado}
+        </span>
         <input
           type="number"
           value={cantidad}
           onChange={(e) => setCantidad(e.target.value)}
         />
-        <button className="btn btn-secondary" onClick={guardar} disabled={guardando}>
+        <button
+          className="btn btn-secondary"
+          onClick={guardar}
+          disabled={guardando}
+        >
           {guardado ? "✓" : "Guardar"}
         </button>
       </div>
