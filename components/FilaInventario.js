@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function FilaInventario({ item }) {
+  const router = useRouter();
   const [cantidad, setCantidad] = useState(item.cantidad_actual);
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
@@ -12,14 +14,25 @@ export default function FilaInventario({ item }) {
   async function guardar() {
     setGuardando(true);
     setGuardado(false);
-    await fetch("/api/inventario", {
+
+    const res = await fetch("/api/inventario", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: item.id, cantidad_actual: Number(cantidad) }),
     });
+
     setGuardando(false);
+
+    if (!res.ok) {
+      alert("No se pudo guardar, intenta de nuevo.");
+      return;
+    }
+
     setGuardado(true);
     setTimeout(() => setGuardado(false), 1500);
+
+    // Trae los datos frescos del servidor
+    router.refresh();
   }
 
   return (

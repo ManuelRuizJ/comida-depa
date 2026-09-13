@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
 export default function MenuForm({ platillos, menuActual }) {
+  const router = useRouter();
+
   const inicial = {};
   DIAS.forEach((dia) => {
     inicial[dia] = new Set(
@@ -35,15 +38,22 @@ export default function MenuForm({ platillos, menuActual }) {
       platillo_ids: Array.from(seleccion[dia]),
     }));
 
-    await fetch("/api/menu", {
+    const res = await fetch("/api/menu", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ dias: payload }),
     });
 
     setGuardando(false);
+
+    if (!res.ok) {
+      alert("No se pudo guardar el menú, intenta de nuevo.");
+      return;
+    }
+
     setGuardado(true);
     setTimeout(() => setGuardado(false), 2000);
+    router.refresh();
   }
 
   return (
