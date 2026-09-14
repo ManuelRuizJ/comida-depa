@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
@@ -9,7 +9,13 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 async function main() {
   const { data: items, error } = await supabase
@@ -56,15 +62,24 @@ async function main() {
       </a>
     </div>`;
 
-  const result = await resend.emails.send({
-    from: "Cocina Depa <onboarding@resend.dev>",
-    to: process.env.EMAIL_TO,
+  const result = await transporter.sendMail({
+    from: `"Cocina Depa" <${process.env.GMAIL_USER}>`,
+    to: getDestinatarios(),
     subject: `🛒 ${faltantes.length} cosa${faltantes.length === 1 ? "" : "s"} por comprar`,
     html,
   });
 
-  console.log("Correo enviado:", result);
+  console.log("Correo enviado:", result.messageId);
 }
+
+
+function getDestinatarios() {
+  return (process.env.EMAIL_TO || "")
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean);
+}
+
 
 main().catch((err) => {
   console.error("Error:", err);
