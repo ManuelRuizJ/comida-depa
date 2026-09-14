@@ -481,6 +481,52 @@ input[type="number"] {
   }
 }
 
+
+/* ============================================================ */
+/* Fila de inventario                                            */
+/* ============================================================ */
+.fila-inventario {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.fila-inventario:last-child {
+  border-bottom: none;
+}
+
+.inv-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.inv-input {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inv-label {
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.inv-input input {
+  width: 76px;
+  padding: 6px 8px;
+  font-size: 0.9rem;
+}
+
+.btn-borrar {
+  color: #b03a2e;
+  padding: 8px 12px;
+}
+
 /* Pantallas muy chicas (iPhone SE) */
 @media (max-width: 380px) {
   .nav {
@@ -517,5 +563,30 @@ input[type="number"] {
 
   .receta-acciones .btn {
     flex: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .fila-inventario {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .fila-controles {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .inv-inputs {
+    flex: 1;
+  }
+
+  .inv-input {
+    flex: 1;
+  }
+
+  .inv-input input {
+    width: 100%;
   }
 }
