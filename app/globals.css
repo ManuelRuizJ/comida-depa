@@ -336,6 +336,22 @@ input[type="number"] {
 }
 
 
+/* ============================================================ */
+/* Header de receta con acciones                                 */
+/* ============================================================ */
+.receta-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.receta-acciones {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+
 
 
 /* ============================================================ */
@@ -486,5 +502,20 @@ input[type="number"] {
 
   .fila-controles input[type="number"] {
     width: 72px;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .receta-header {
+    flex-direction: column;
+  }
+
+  .receta-acciones {
+    width: 100%;
+  }
+
+  .receta-acciones .btn {
+    flex: 1;
   }
 }
