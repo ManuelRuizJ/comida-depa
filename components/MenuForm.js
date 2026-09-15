@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
 export default function MenuForm({ platillos, menuActual }) {
   const router = useRouter();
+  const { toast } = useToast();
 
   const inicial = {};
   DIAS.forEach((dia) => {
@@ -17,7 +19,6 @@ export default function MenuForm({ platillos, menuActual }) {
 
   const [seleccion, setSeleccion] = useState(inicial);
   const [guardando, setGuardando] = useState(false);
-  const [guardado, setGuardado] = useState(false);
 
   function toggle(dia, platilloId) {
     setSeleccion((prev) => {
@@ -47,12 +48,11 @@ export default function MenuForm({ platillos, menuActual }) {
     setGuardando(false);
 
     if (!res.ok) {
-      alert("No se pudo guardar el menú, intenta de nuevo.");
+      toast("No se pudo guardar el menú", "error");
       return;
     }
 
-    setGuardado(true);
-    setTimeout(() => setGuardado(false), 2000);
+    toast("Menú guardado");
     router.refresh();
   }
 
@@ -82,8 +82,12 @@ export default function MenuForm({ platillos, menuActual }) {
         </div>
       ))}
 
-      <button className="btn btn-primary" onClick={guardar} disabled={guardando}>
-        {guardado ? "✓ Guardado" : guardando ? "Guardando..." : "Guardar menú"}
+      <button
+        className="btn btn-primary"
+        onClick={guardar}
+        disabled={guardando}
+      >
+        {guardando ? <span className="spinner" /> : "Guardar menú"}
       </button>
     </div>
   );

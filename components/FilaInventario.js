@@ -2,20 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
 
 export default function FilaInventario({ item, usos = 0 }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [cantidad, setCantidad] = useState(item.cantidad_actual);
   const [minima, setMinima] = useState(item.cantidad_minima);
   const [guardando, setGuardando] = useState(false);
-  const [guardado, setGuardado] = useState(false);
   const [borrando, setBorrando] = useState(false);
 
   const faltante = item.estado.includes("Comprar");
 
   async function guardar() {
     setGuardando(true);
-    setGuardado(false);
 
     const res = await fetch(`/api/inventario/${item.ingrediente_id}`, {
       method: "PATCH",
@@ -29,12 +29,11 @@ export default function FilaInventario({ item, usos = 0 }) {
     setGuardando(false);
 
     if (!res.ok) {
-      alert("No se pudo guardar, intenta de nuevo.");
+      toast("No se pudo guardar, intenta de nuevo", "error");
       return;
     }
 
-    setGuardado(true);
-    setTimeout(() => setGuardado(false), 1500);
+    toast(`${item.nombre} actualizado`);
     router.refresh();
   }
 
@@ -43,8 +42,7 @@ export default function FilaInventario({ item, usos = 0 }) {
     if (usos > 0) {
       mensaje += `\n\n⚠️ Está usado en ${usos} receta(s). También se quitará de ahí.`;
     }
-    const confirmado = confirm(mensaje);
-    if (!confirmado) return;
+    if (!confirm(mensaje)) return;
 
     setBorrando(true);
     const res = await fetch(`/api/inventario/${item.ingrediente_id}`, {
@@ -53,10 +51,11 @@ export default function FilaInventario({ item, usos = 0 }) {
     setBorrando(false);
 
     if (!res.ok) {
-      alert("No se pudo borrar, intenta de nuevo.");
+      toast("No se pudo borrar", "error");
       return;
     }
 
+    toast(`"${item.nombre}" borrado`, "warn");
     router.refresh();
   }
 
@@ -99,13 +98,14 @@ export default function FilaInventario({ item, usos = 0 }) {
           onClick={guardar}
           disabled={guardando}
         >
-          {guardado ? "✓" : "Guardar"}
+          {guardando ? <span className="spinner" /> : "Guardar"}
         </button>
 
         <button
           className="btn btn-ghost btn-borrar"
           onClick={borrar}
           disabled={borrando}
+          aria-label="Borrar"
         >
           {borrando ? "..." : "✕"}
         </button>

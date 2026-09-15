@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
 
 const UNIDADES = ["piezas", "gramos", "ml", "litros", "latas", "rebanadas", "diente"];
 const CATEGORIAS = ["Verdura", "Proteína", "Lácteo", "Abarrotes", "Condimento", "Otro"];
 
 export default function NuevoIngredienteForm() {
+  const { toast } = useToast();
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
   const [nombre, setNombre] = useState("");
@@ -42,10 +44,11 @@ export default function NuevoIngredienteForm() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "Algo falló al guardar.");
+      toast(data.error || "Algo falló al guardar", "error");
       return;
     }
 
+    toast(`"${nombre}" agregado al inventario`);
     setNombre("");
     setCategoria("Abarrotes");
     setUnidad("piezas");
@@ -120,7 +123,7 @@ export default function NuevoIngredienteForm() {
 
       <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
         <button type="submit" className="btn btn-primary" disabled={guardando}>
-          {guardando ? "Guardando..." : "Agregar"}
+          {guardando ? <span className="spinner" /> : "Agregar"}
         </button>
         <button
           type="button"

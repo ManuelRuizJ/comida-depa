@@ -2,21 +2,30 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
 
 export default function ItemHoy({ item }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [comido, setComido] = useState(item.comido);
   const [cargando, setCargando] = useState(false);
 
   async function marcar(valor) {
     setCargando(true);
-    await fetch("/api/comido", {
+    const res = await fetch("/api/comido", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: item.id, comido: valor }),
     });
-    setComido(valor);
     setCargando(false);
+
+    if (!res.ok) {
+      toast("No se pudo marcar, intenta de nuevo", "error");
+      return;
+    }
+
+    setComido(valor);
+    toast(valor ? "¡Buen provecho!" : "Marcado como pendiente");
     router.refresh();
   }
 
@@ -34,7 +43,7 @@ export default function ItemHoy({ item }) {
             onClick={() => marcar(true)}
             disabled={cargando}
           >
-            Sí, lo comí
+            {cargando ? <span className="spinner" /> : "Sí, lo comí"}
           </button>
         )}
         <a href="/menu" className="btn btn-ghost">

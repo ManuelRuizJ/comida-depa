@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
 
 const UNIDADES = ["piezas", "gramos", "ml", "litros"];
 const CATEGORIAS = ["Desayuno", "Comida", "Cena", "Snack"];
@@ -12,7 +13,8 @@ export default function RecetaEditForm({
   categoriaInicial,
   tiempoInicial,
   ingredientesIniciales,
-}) {
+  }) {
+  const { toast } = useToast();
   const router = useRouter();
   const [nombre, setNombre] = useState(nombreInicial);
   const [categoria, setCategoria] = useState(categoriaInicial);
@@ -67,10 +69,13 @@ export default function RecetaEditForm({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "Algo falló al guardar.");
+      toast(data.error || "Algo falló al guardar", "error");
       return;
     }
 
+    toast("Cambios guardados");
+    router.push("/recetas");
+    router.refresh();
     router.push("/recetas");
     router.refresh();
   }
@@ -160,7 +165,7 @@ export default function RecetaEditForm({
 
       <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
         <button type="submit" className="btn btn-primary" disabled={guardando}>
-          {guardando ? "Guardando..." : "Guardar cambios"}
+          {guardando ? <span className="spinner" /> : "Guardar cambios"}
         </button>
         <button
           type="button"

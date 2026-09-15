@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
 
 export default function BotonBorrarReceta({ id, nombre }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [borrando, setBorrando] = useState(false);
 
   async function borrar() {
@@ -18,10 +20,11 @@ export default function BotonBorrarReceta({ id, nombre }) {
     setBorrando(false);
 
     if (!res.ok) {
-      alert("No se pudo borrar, intenta de nuevo.");
+      toast("No se pudo borrar", "error");
       return;
     }
 
+    toast(`"${nombre}" borrada`, "warn");
     router.refresh();
   }
 

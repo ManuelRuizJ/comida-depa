@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ToastProvider";
+
 
 const UNIDADES = ["piezas", "gramos", "ml", "litros"];
 const CATEGORIAS = ["Desayuno", "Comida", "Cena", "Snack"];
 
 export default function RecetaForm() {
+  const { toast } = useToast();
   const router = useRouter();
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("Comida");
@@ -68,9 +71,15 @@ export default function RecetaForm() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "Algo falló al guardar.");
+      toast(data.error || "Algo falló al guardar", "error");
       return;
     }
+
+    toast("Receta guardada");
+    setNombre("");
+    setTiempo(20);
+    setIngredientes([{ nombre: "", cantidad: "", unidad: "piezas" }]);
+    router.refresh();
 
     setNombre("");
     setTiempo(20);
@@ -161,15 +170,10 @@ export default function RecetaForm() {
         + Ingrediente
       </button>
 
-      {error && (
-        <p style={{ color: "#b03a2e", marginTop: 12, fontSize: "0.9rem" }}>
-          {error}
-        </p>
-      )}
-
+      
       <div style={{ marginTop: 20 }}>
         <button type="submit" className="btn btn-primary" disabled={guardando}>
-          {guardando ? "Guardando..." : "Guardar receta"}
+          {guardando ? <span className="spinner" /> : "Guardar receta"}
         </button>
       </div>
     </form>
