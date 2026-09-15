@@ -4,38 +4,21 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 
-export default function FilaInventario({ item, usos = 0 }) {
+export default function FilaInventario({
+  item,
+  usos = 0,
+  valores,
+  onChange,
+  onBorrado,
+}) {
   const router = useRouter();
   const { toast } = useToast();
-  const [cantidad, setCantidad] = useState(item.cantidad_actual);
-  const [minima, setMinima] = useState(item.cantidad_minima);
-  const [guardando, setGuardando] = useState(false);
   const [borrando, setBorrando] = useState(false);
 
   const faltante = item.estado.includes("Comprar");
-
-  async function guardar() {
-    setGuardando(true);
-
-    const res = await fetch(`/api/inventario/${item.ingrediente_id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cantidad_actual: Number(cantidad),
-        cantidad_minima: Number(minima),
-      }),
-    });
-
-    setGuardando(false);
-
-    if (!res.ok) {
-      toast("No se pudo guardar, intenta de nuevo", "error");
-      return;
-    }
-
-    toast(`${item.nombre} actualizado`);
-    router.refresh();
-  }
+  const cambiado =
+    Number(valores.cantidad_actual) !== Number(item.cantidad_actual) ||
+    Number(valores.cantidad_minima) !== Number(item.cantidad_minima);
 
   async function borrar() {
     let mensaje = `¿Borrar "${item.nombre}" del inventario?`;
@@ -56,16 +39,17 @@ export default function FilaInventario({ item, usos = 0 }) {
     }
 
     toast(`"${item.nombre}" borrado`, "warn");
-    router.refresh();
+    onBorrado?.();
   }
 
   return (
-    <div className="fila-inventario">
+    <div className={`fila-inventario ${cambiado ? "fila-cambiada" : ""}`}>
       <div className="fila-info">
         <div className="row-name">{item.nombre}</div>
         <div className="row-sub">
           {item.unidad}
           {usos > 0 && ` · ${usos} receta${usos === 1 ? "" : "s"}`}
+          {cambiado && <span className="badge-sin-guardar"> · sin guardar</span>}
         </div>
       </div>
 
@@ -79,27 +63,19 @@ export default function FilaInventario({ item, usos = 0 }) {
             <span className="inv-label">Tienes</span>
             <input
               type="number"
-              value={cantidad}
-              onChange={(e) => setCantidad(e.target.value)}
+              value={valores.cantidad_actual}
+              onChange={(e) => onChange("cantidad_actual", e.target.value)}
             />
           </label>
           <label className="inv-input">
             <span className="inv-label">Mínimo</span>
             <input
               type="number"
-              value={minima}
-              onChange={(e) => setMinima(e.target.value)}
+              value={valores.cantidad_minima}
+              onChange={(e) => onChange("cantidad_minima", e.target.value)}
             />
           </label>
         </div>
-
-        <button
-          className="btn btn-secondary"
-          onClick={guardar}
-          disabled={guardando}
-        >
-          {guardando ? <span className="spinner" /> : "Guardar"}
-        </button>
 
         <button
           className="btn btn-ghost btn-borrar"

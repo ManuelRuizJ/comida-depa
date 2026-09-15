@@ -1,10 +1,10 @@
 import { supabase } from "@/lib/supabase";
-import FilaInventario from "@/components/FilaInventario";
 import NuevoIngredienteForm from "@/components/NuevoIngredienteForm";
-
-export const metadata = { title: "Inventario" };
+import ListaInventario from "@/components/ListaInventario";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = { title: "Inventario" };
 
 export default async function InventarioPage() {
   const { data, error } = await supabase
@@ -12,7 +12,6 @@ export default async function InventarioPage() {
     .select("*")
     .order("nombre");
 
-  // Cuenta cuántas recetas usan cada ingrediente
   const { data: usos } = await supabase
     .from("receta_ingredientes")
     .select("ingrediente_id");
@@ -27,28 +26,28 @@ export default async function InventarioPage() {
     <div>
       <h1>Inventario</h1>
       <p className="row-sub">
-        Actualiza lo que tienen en el depa. El estado se recalcula solo.
+        Actualiza lo que tienen en el depa. Los cambios se guardan en bloque.
       </p>
 
       <div className="card">
         <NuevoIngredienteForm />
       </div>
 
-      <div className="card">
-        {error && (
+      {error && (
+        <div className="card">
           <p className="empty">Error cargando inventario: {error.message}</p>
-        )}
-        {!error && (!data || data.length === 0) && (
+        </div>
+      )}
+
+      {!error && (!data || data.length === 0) && (
+        <div className="card">
           <p className="empty">Todavía no hay ingredientes en el inventario.</p>
-        )}
-        {data?.map((item) => (
-          <FilaInventario
-            key={item.id}
-            item={item}
-            usos={usosPorIngrediente[item.ingrediente_id] || 0}
-          />
-        ))}
-      </div>
+        </div>
+      )}
+
+      {!error && data && data.length > 0 && (
+        <ListaInventario items={data} usosPorIngrediente={usosPorIngrediente} />
+      )}
     </div>
   );
 }

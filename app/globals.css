@@ -648,6 +648,87 @@ input[type="number"] {
 }
 
 
+/* ============================================================ */
+/* Toolbar de inventario (búsqueda + filtros)                    */
+/* ============================================================ */
+.inv-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.inv-busqueda {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: white;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.inv-busqueda:focus {
+  outline: none;
+  border-color: var(--sage-300);
+}
+
+.inv-filtros {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================ */
+/* Fila con cambios sin guardar                                  */
+/* ============================================================ */
+.fila-cambiada {
+  background: rgba(217, 164, 65, 0.07);
+  margin: 0 -12px;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  border-radius: 8px;
+}
+
+.badge-sin-guardar {
+  color: var(--mustard-700);
+  font-weight: 500;
+}
+
+/* ============================================================ */
+/* Barra flotante de guardar                                     */
+/* ============================================================ */
+.guardar-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 720px;
+  width: calc(100% - 32px);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(34, 50, 38, 0.14);
+  z-index: 500;
+  animation: slideUp 0.2s ease-out;
+}
+
+.guardar-bar-texto {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+
+
+
+
 
 
 /* Pantallas muy chicas (iPhone SE) */
@@ -763,4 +844,38 @@ input[type="number"] {
     align-items: flex-start;
     gap: 6px;
   }
+}
+
+
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 640px) {
+  .guardar-bar {
+    bottom: 12px;
+    padding: 10px 14px;
+  }
+
+  .guardar-bar-texto {
+    font-size: 0.85rem;
+  }
+
+  .inv-busqueda {
+    padding: 10px 14px;
+    font-size: 1rem;
+  }
+}
+
+/* Deja espacio abajo para que la barra flotante no tape la última fila */
+.page {
+  padding-bottom: 140px;
 }

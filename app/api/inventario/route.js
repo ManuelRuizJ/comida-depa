@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
   const body = await request.json();
+  const { cambios } = body;
   const { nombre, categoria, unidad, cantidad_actual, cantidad_minima } = body;
 
   if (!nombre || !nombre.trim()) {
@@ -11,6 +12,10 @@ export async function POST(request) {
 
   if (!unidad || !unidad.trim()) {
     return NextResponse.json({ error: "La unidad es obligatoria" }, { status: 400 });
+  }
+
+  if (!Array.isArray(cambios) || cambios.length === 0) {
+    return NextResponse.json({ error: "Sin cambios" }, { status: 400 });
   }
 
   // 1. Crear el ingrediente
@@ -44,9 +49,20 @@ export async function POST(request) {
       { onConflict: "ingrediente_id" }
     );
 
-  if (errInv) {
-    return NextResponse.json({ error: errInv.message }, { status: 500 });
+  const filas = cambios.map((c) => ({
+    ingrediente_id: c.id,
+    cantidad_actual: Number(c.cantidad_actual),
+    cantidad_minima: Number(c.cantidad_minima),
+    updated_at: new Date().toISOString(),
+  }));
+
+  const { error } = await supabase
+    .from("inventario")
+    .upsert(filas, { onConflict: "ingrediente_id" });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, id: ingrediente.id });
+  return NextResponse.json({ ok: true });
 }
