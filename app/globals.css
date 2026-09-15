@@ -594,6 +594,61 @@ input[type="number"] {
 }
 
 
+/* Uso de ingrediente en la lista de compras */
+.uso-platillos {
+  font-size: 0.8rem;
+  color: var(--sage-700);
+  margin-top: 2px;
+  font-style: italic;
+}
+
+
+/* ============================================================ */
+/* Lista de compras                                              */
+/* ============================================================ */
+.card-comprar {
+  background: linear-gradient(180deg, white 0%, #fbe9d0 100%);
+  border-color: var(--mustard-300);
+}
+
+.platillo-card {
+  padding: 16px 20px;
+}
+
+.platillo-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.platillo-head h3 {
+  font-family: var(--font-display), serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--sage-900);
+  margin: 0;
+}
+
+.platillo-dias {
+  font-size: 0.82rem;
+  color: var(--sage-700);
+  background: var(--sage-50);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.platillo-card .row {
+  padding: 8px 0;
+}
+
+
+
 
 /* Pantallas muy chicas (iPhone SE) */
 @media (max-width: 380px) {
@@ -698,5 +753,14 @@ input[type="number"] {
 @media (max-width: 640px) {
   .hero-hoy {
     padding: 20px 16px;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .platillo-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 }
