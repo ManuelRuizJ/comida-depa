@@ -2,6 +2,8 @@ import { supabase } from "@/lib/supabase";
 import FilaInventario from "@/components/FilaInventario";
 import NuevoIngredienteForm from "@/components/NuevoIngredienteForm";
 
+export const metadata = { title: "Inventario" };
+
 export const dynamic = "force-dynamic";
 
 export default async function InventarioPage() {

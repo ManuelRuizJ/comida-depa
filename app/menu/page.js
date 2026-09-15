@@ -1,6 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import MenuForm from "@/components/MenuForm";
 
+
+export const metadata = { title: "Menú" };
+
 export const dynamic = "force-dynamic";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];

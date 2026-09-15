@@ -50,3 +50,12 @@ export default async function EditarRecetaPage({ params }) {
     </div>
   );
 }
+
+export async function generateMetadata({ params }) {
+  const { data } = await supabase
+    .from("platillos")
+    .select("nombre")
+    .eq("id", params.id)
+    .single();
+  return { title: data?.nombre ? `Editar ${data.nombre}` : "Editar receta" };
+}

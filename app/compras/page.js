@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
+export const metadata = { title: "Compras" };
+
 export const dynamic = "force-dynamic";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];

@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import ItemHoy from "@/components/ItemHoy";
 
+export const metadata = { title: "Hoy" };
+
 export const dynamic = "force-dynamic";
 
 const DIAS_VALIDOS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];

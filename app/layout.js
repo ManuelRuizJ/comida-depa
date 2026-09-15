@@ -15,7 +15,10 @@ const publicSans = Public_Sans({
 });
 
 export const metadata = {
-  title: "Cocina Depa",
+  title: {
+    default: "Cocina Depa",
+    template: "%s · Cocina Depa",
+  },
   description: "Inventario y menú semanal, para dos",
 };
 
