@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
+// POST /api/inventario — crear un ingrediente nuevo
 export async function POST(request) {
   const body = await request.json();
-  const { cambios } = body;
   const { nombre, categoria, unidad, cantidad_actual, cantidad_minima } = body;
 
   if (!nombre || !nombre.trim()) {
@@ -14,11 +14,6 @@ export async function POST(request) {
     return NextResponse.json({ error: "La unidad es obligatoria" }, { status: 400 });
   }
 
-  if (!Array.isArray(cambios) || cambios.length === 0) {
-    return NextResponse.json({ error: "Sin cambios" }, { status: 400 });
-  }
-
-  // 1. Crear el ingrediente
   const { data: ingrediente, error: errIng } = await supabase
     .from("ingredientes")
     .upsert(
@@ -36,7 +31,6 @@ export async function POST(request) {
     return NextResponse.json({ error: errIng.message }, { status: 500 });
   }
 
-  // 2. Asegurar la fila de inventario (con cantidad actual y mínima)
   const { error: errInv } = await supabase
     .from("inventario")
     .upsert(
@@ -48,6 +42,22 @@ export async function POST(request) {
       },
       { onConflict: "ingrediente_id" }
     );
+
+  if (errInv) {
+    return NextResponse.json({ error: errInv.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, id: ingrediente.id });
+}
+
+// PATCH /api/inventario — guardar varios cambios de un jalón (batch)
+export async function PATCH(request) {
+  const body = await request.json();
+  const { cambios } = body;
+
+  if (!Array.isArray(cambios) || cambios.length === 0) {
+    return NextResponse.json({ error: "Sin cambios" }, { status: 400 });
+  }
 
   const filas = cambios.map((c) => ({
     ingrediente_id: c.id,
