@@ -14,10 +14,12 @@
  */
 
 import { supabase } from "./lib/supabase.mjs";
+import { normalizarUnidad } from "../lib/constantes.mjs";
 
 // ============================================================
 // 1. EDITA AQUÍ TUS RECETAS (copiado y traducido de tu Notion)
-// Unidad: "piezas" | "gramos" | "ml" | "litros"
+// Unidad: cualquiera de UNIDADES en lib/constantes.mjs. Variantes como
+// "pieza" o "gr" se normalizan al guardar.
 // ============================================================
 const RECETAS = {
   Chilaquiles: {
@@ -419,7 +421,7 @@ Toast: {
 async function getOrCreateIngrediente(nombre, unidad) {
   const { data, error } = await supabase
     .from("ingredientes")
-    .upsert({ nombre, unidad }, { onConflict: "nombre" })
+    .upsert({ nombre, unidad: normalizarUnidad(unidad) }, { onConflict: "nombre" })
     .select("id")
     .single();
   if (error) throw error;

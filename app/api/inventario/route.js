@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 import { errorJson, leerJson } from "@/lib/api";
+import { normalizarUnidad } from "@/lib/constantes";
+import { limpiarNombre } from "@/lib/ingredientes";
 
 // POST /api/inventario — crear un ingrediente nuevo
 export async function POST(request) {
@@ -20,9 +22,9 @@ export async function POST(request) {
     .from("ingredientes")
     .upsert(
       {
-        nombre: nombre.trim(),
+        nombre: limpiarNombre(nombre),
         categoria: categoria || null,
-        unidad: unidad.trim(),
+        unidad: normalizarUnidad(unidad),
       },
       { onConflict: "nombre" }
     )
