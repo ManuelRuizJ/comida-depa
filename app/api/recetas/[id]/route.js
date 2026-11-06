@@ -1,12 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { DUPLICADO, errorJson, leerJson } from "@/lib/api";
 
 export async function PUT(request, { params }) {
   const { id } = params;
-  const body = await request.json();
-  const { nombre, categoria, tiempo, ingredientes } = body;
+  const body = await leerJson(request);
+  if (!body) return errorJson("Datos inválidos", 400);
+  const { categoria, tiempo, ingredientes } = body;
+  const nombre = String(body.nombre ?? "").trim();
 
-  if (!nombre || !nombre.trim()) {
+  if (!nombre) {
     return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
   }
 
@@ -16,6 +19,9 @@ export async function PUT(request, { params }) {
     .update({ nombre, categoria, tiempo_min: tiempo })
     .eq("id", id);
 
+  if (errPlatillo?.code === DUPLICADO) {
+    return errorJson(`Ya existe otra receta llamada "${nombre}".`, 409);
+  }
   if (errPlatillo) {
     return NextResponse.json({ error: errPlatillo.message }, { status: 500 });
   }

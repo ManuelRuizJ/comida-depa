@@ -1,9 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { errorJson, leerJson } from "@/lib/api";
 
 // POST /api/inventario — crear un ingrediente nuevo
 export async function POST(request) {
-  const body = await request.json();
+  const body = await leerJson(request);
+  if (!body) return errorJson("Datos inválidos", 400);
   const { nombre, categoria, unidad, cantidad_actual, cantidad_minima } = body;
 
   if (!nombre || !nombre.trim()) {
@@ -52,11 +54,21 @@ export async function POST(request) {
 
 // PATCH /api/inventario — guardar varios cambios de un jalón (batch)
 export async function PATCH(request) {
-  const body = await request.json();
-  const { cambios } = body;
+  const body = await leerJson(request);
+  const cambios = body?.cambios;
 
   if (!Array.isArray(cambios) || cambios.length === 0) {
     return NextResponse.json({ error: "Sin cambios" }, { status: 400 });
+  }
+
+  const invalido = cambios.some(
+    (c) =>
+      !c?.id ||
+      !Number.isFinite(Number(c.cantidad_actual)) ||
+      !Number.isFinite(Number(c.cantidad_minima))
+  );
+  if (invalido) {
+    return errorJson("Hay cantidades que no son números", 400);
   }
 
   const filas = cambios.map((c) => ({
