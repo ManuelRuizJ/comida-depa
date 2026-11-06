@@ -6,6 +6,9 @@ on:
     - cron: "0 14 * * 5"
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 jobs:
   enviar:
     runs-on: ubuntu-latest
@@ -13,8 +16,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-      - run: npm ci
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --omit=dev
       - run: node scripts/menu_semanal.mjs
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
