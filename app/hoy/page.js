@@ -1,20 +1,14 @@
 import { supabase } from "@/lib/supabase";
 import ItemHoy from "@/components/ItemHoy";
+import { diaDeHoy, esDiaLaborable } from "@/lib/fecha";
 
 export const metadata = { title: "Hoy" };
 
 export const dynamic = "force-dynamic";
 
-const DIAS_VALIDOS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-
-function diaDeHoy() {
-  const nombres = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-  return nombres[new Date().getDay()];
-}
-
 export default async function HoyPage() {
   const hoy = diaDeHoy();
-  const esDiaDeSemana = DIAS_VALIDOS.includes(hoy);
+  const esDiaDeSemana = esDiaLaborable(hoy);
 
   let items = [];
   if (esDiaDeSemana) {

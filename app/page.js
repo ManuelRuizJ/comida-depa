@@ -1,16 +1,10 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-
-const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-
-function diaDeHoy() {
-  const nombres = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-  return nombres[new Date().getDay()];
-}
+import { diaDeHoy, esDiaLaborable } from "@/lib/fecha";
 
 export default async function Home() {
   const hoy = diaDeHoy();
-  const esDiaDeSemana = DIAS.includes(hoy);
+  const esDiaDeSemana = esDiaLaborable(hoy);
 
   let itemsHoy = [];
   if (esDiaDeSemana) {
