@@ -19,6 +19,10 @@ export const metadata = {
     template: "%s · Cocina Depa",
   },
   description: "Menú semanal, inventario y lista de compras del depa.",
+  applicationName: "Cocina Depa",
+  robots: { index: false, follow: false },
+  appleWebApp: { capable: true, title: "Cocina", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport = {

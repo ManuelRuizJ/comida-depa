@@ -32,6 +32,9 @@ export async function middleware(request) {
 }
 
 export const config = {
-  // Todo pasa por aquí excepto los archivos estáticos y el endpoint de login.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|api/login).*)"],
+  // Todo pasa por aquí excepto los archivos estáticos, el endpoint de login
+  // y lo que el navegador pide sin cookies (manifest, íconos, robots.txt).
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|icon-192.png|icon-512.png|icon-maskable-512.png|manifest.webmanifest|robots.txt|api/login).*)",
+  ],
 };
