@@ -283,6 +283,12 @@ input[type="number"] {
   margin-bottom: 4px;
 }
 
+.texto-error {
+  color: #b03a2e;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
 .form-field input,
 .form-field select {
   width: 100%;
