@@ -4,8 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 import ModalPlatillos from "./ModalPlatillos";
-
-const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+import { DIAS_SEMANA as DIAS } from "@/lib/fecha";
 
 export default function MenuForm({ platillos, menuActual }) {
   const router = useRouter();

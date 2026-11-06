@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
-
-
-const UNIDADES = ["piezas", "gramos", "ml", "litros"];
-const CATEGORIAS = ["Desayuno", "Comida", "Cena", "Snack"];
+import { CATEGORIAS_PLATILLO as CATEGORIAS, UNIDADES } from "@/lib/constantes";
 
 export default function RecetaForm() {
   const { toast } = useToast();
