@@ -72,6 +72,7 @@ a {
 
 .nav {
   display: flex;
+  align-items: center;
   gap: 20px;
 }
 
@@ -1226,4 +1227,24 @@ body:has(.login-wrap) .nav {
   .login-card {
     padding: 24px 18px;
   }
+}
+
+.btn-salir {
+  margin-left: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn-salir:hover {
+  color: var(--mustard-700);
+  border-color: var(--mustard-300);
 }

@@ -2,6 +2,7 @@ import { Fraunces, Public_Sans } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
+import BotonSalir from "@/components/BotonSalir";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({ children }) {
               <Link href="/inventario">Inventario</Link>
               <Link href="/compras">Compras</Link>
               <Link href="/recetas">Recetas</Link>
+              <BotonSalir />
             </nav>
           </header>
           <main className="page">{children}</main>
