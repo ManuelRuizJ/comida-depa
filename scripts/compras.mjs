@@ -1,6 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { DIAS_SEMANA } from "../lib/fecha.mjs";
+import {
+  SELECT_INVENTARIO_COMPRAS,
+  SELECT_MENU_COMPRAS,
+  calcularCompras,
+  formatearCantidad as fmt,
+} from "../lib/compras.mjs";
 
 dotenv.config({ path: ".env.local" });
 
@@ -17,59 +24,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-
 async function main() {
-  const { data: menu, error: errMenu } = await supabase
-    .from("menu_semana")
-    .select(
-      "platillos(nombre, receta_ingredientes(cantidad_requerida, ingredientes(id, nombre, unidad)))"
-    )
-    .in("dia", DIAS);
+  const [{ data: menu, error: errMenu }, { data: inventario, error: errInv }] =
+    await Promise.all([
+      supabase.from("menu_semana").select(SELECT_MENU_COMPRAS).in("dia", DIAS_SEMANA),
+      supabase.from("inventario_con_estado").select(SELECT_INVENTARIO_COMPRAS),
+    ]);
 
   if (errMenu) throw errMenu;
+  if (errInv) throw errInv;
 
-  const { data: inventario } = await supabase
-    .from("inventario_con_estado")
-    .select("ingrediente_id, cantidad_actual");
-
-  const invPorId = {};
-  (inventario || []).forEach((i) => {
-    invPorId[i.ingrediente_id] = i;
-  });
-
-  const necesidades = {};
-  (menu || []).forEach((fila) => {
-    const receta = fila.platillos?.receta_ingredientes || [];
-    receta.forEach((ri) => {
-      const ing = ri.ingredientes;
-      if (!ing) return;
-      if (!necesidades[ing.id]) {
-        necesidades[ing.id] = {
-          nombre: ing.nombre,
-          unidad: ing.unidad,
-          requerido: 0,
-        };
-      }
-      necesidades[ing.id].requerido += Number(ri.cantidad_requerida) || 0;
-    });
-  });
-
-  const porComprar = Object.entries(necesidades)
-    .map(([id, n]) => {
-      const inv = invPorId[id];
-      const disponible = inv ? Number(inv.cantidad_actual) : 0;
-      const faltante = Math.max(0, n.requerido - disponible);
-      return {
-        nombre: n.nombre,
-        unidad: n.unidad,
-        requerido: n.requerido,
-        disponible,
-        faltante,
-      };
-    })
-    .filter((i) => i.faltante > 0)
-    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  const { faltantes: porComprar } = calcularCompras(menu, inventario);
 
   if (porComprar.length === 0) {
     console.log("No falta nada. Saliendo sin mandar correo.");
@@ -84,8 +49,8 @@ async function main() {
       <div style="border-bottom: 1px solid #dde3d4; padding: 10px 0;">
         <div style="color: #223226; font-weight: 500;">${item.nombre}</div>
         <div style="color: #55655a; font-size: 0.9rem;">
-          Necesitas ${item.requerido} ${item.unidad} · tienes ${item.disponible}
-          → <strong style="color: #a67322;">comprar ${item.faltante} ${item.unidad}</strong>
+          Necesitas ${fmt(item.requerido)} ${item.unidad} · tienes ${fmt(item.disponible)}
+          → <strong style="color: #a67322;">comprar ${fmt(item.faltante)} ${item.unidad}</strong>
         </div>
       </div>`
     )
