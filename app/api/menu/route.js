@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
-
-const DIAS_VALIDOS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+import { DIAS_SEMANA } from "@/lib/fecha";
 
 export async function POST(request) {
   const body = await request.json();
@@ -12,7 +11,7 @@ export async function POST(request) {
   }
 
   for (const { dia, platillo_ids } of dias) {
-    if (!DIAS_VALIDOS.includes(dia) || !Array.isArray(platillo_ids)) {
+    if (!DIAS_SEMANA.includes(dia) || !Array.isArray(platillo_ids)) {
       return NextResponse.json({ error: `Día inválido: ${dia}` }, { status: 400 });
     }
 

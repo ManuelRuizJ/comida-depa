@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { CATEGORIAS_PLATILLO } from "@/lib/constantes";
 
-const CATEGORIAS = ["Todos", "Desayuno", "Comida", "Cena", "Snack"];
+const CATEGORIAS = ["Todos", ...CATEGORIAS_PLATILLO];
 
 export default function ModalPlatillos({
   dia,
