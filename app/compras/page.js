@@ -1,6 +1,7 @@
 import Link from "next/link";
-import BotonCompartirLista from "@/components/BotonCompartirLista";
+import { CircleCheck, ShoppingCart, TriangleAlert } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import BotonCompartirLista from "@/components/BotonCompartirLista";
 import { DIAS_SEMANA } from "@/lib/fecha";
 import {
   SELECT_INVENTARIO_COMPRAS,
@@ -14,129 +15,139 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Compras" };
 
 export default async function ComprasPage() {
-  const [{ data: menu, error: errMenu }, { data: inventario, error: errInv }] =
-    await Promise.all([
-      supabase.from("menu_semana").select(SELECT_MENU_COMPRAS).in("dia", DIAS_SEMANA),
-      supabase.from("inventario_con_estado").select(SELECT_INVENTARIO_COMPRAS),
-    ]);
+  const [{ data: menu, error: errMenu }, { data: inventario, error: errInv }] = await Promise.all([
+    supabase.from("menu_semana").select(SELECT_MENU_COMPRAS).in("dia", DIAS_SEMANA),
+    supabase.from("inventario_con_estado").select(SELECT_INVENTARIO_COMPRAS),
+  ]);
 
   if (errMenu || errInv) {
-    return (
-      <div>
-        <h1>Lista de compras</h1>
-        <div className="card">
-          <p className="empty texto-error">Error: {errMenu?.message || errInv?.message}</p>
-        </div>
-      </div>
-    );
+    throw new Error(`No se pudo calcular la lista: ${(errMenu || errInv).message}`);
   }
 
   const { platillos, faltantes, disponible } = calcularCompras(menu, inventario);
-  const faltantePorId = Object.fromEntries(faltantes.map((f) => [f.id, f.faltante]));
 
   return (
-    <div>
-      <h1>Lista de compras</h1>
-      <p className="row-sub">
-        Lo que falta para los platillos pendientes de la semana, descontando lo que ya hay.
-      </p>
-
-      {platillos.length === 0 && (
-        <div className="card">
-          <p className="empty">
-            Todavía no hay menú armado para esta semana. Ve a{" "}
-            <Link href="/menu">Menú</Link> y elige qué van a comer.
+    <>
+      <header className="page-head">
+        <div>
+          <h1>Lista de compras</h1>
+          <p className="page-sub">
+            Lo que piden los platillos pendientes de la semana, menos lo que ya hay en el inventario.
           </p>
         </div>
-      )}
-
-      {/* --- Resumen rápido --- */}
-      {faltantes.length > 0 && (
-        <div className="card card-comprar">
-          <div className="compras-head">
-            <div>
-              <h2 style={{ marginBottom: 4 }}>🛒 A comprar ({faltantes.length})</h2>
-              <p className="row-sub" style={{ margin: 0 }}>
-                Lo que falta para cubrir todo el menú:
-              </p>
-            </div>
+        {faltantes.length > 0 && (
+          <div className="page-acciones">
             <BotonCompartirLista texto={listaComoTexto(faltantes)} />
           </div>
-          {faltantes.map((item) => (
-            <div className="row" key={item.id}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="row-name">{item.nombre}</div>
-                <div className="row-sub">
-                  Necesitas {fmt(item.requerido)} {item.unidad} · tienes{" "}
-                  {fmt(item.disponible)}
-                </div>
-              </div>
-              <span className="pill pill-warn">
-                {fmt(item.faltante)} {item.unidad}
-              </span>
-            </div>
-          ))}
+        )}
+      </header>
+
+      {platillos.length === 0 ? (
+        <div className="panel vacio">
+          <ShoppingCart size={28} aria-hidden="true" />
+          <strong>No hay platillos pendientes esta semana</strong>
+          <p>La lista se arma sola a partir del menú.</p>
+          <Link href="/menu" className="btn btn-secondary btn-sm">
+            Armar el menú
+          </Link>
         </div>
-      )}
-
-      {platillos.length > 0 && faltantes.length === 0 && (
-        <div className="card">
-          <p className="empty">
-            🎉 No falta nada. Todo cubierto con lo que hay en el depa.
-          </p>
-        </div>
-      )}
-
-      {/* --- Desglose por platillo --- */}
-      {platillos.length > 0 && (
-        <>
-          <h2 style={{ marginTop: 32 }}>Desglose por platillo</h2>
-          {platillos.map((p) => (
-            <div className="card platillo-card" key={p.id}>
-              <div className="platillo-head">
-                <h3>{p.nombre}</h3>
-                <span className="platillo-dias">
-                  {p.dias.join(" · ")}
-                  {p.veces > 1 && ` (×${p.veces})`}
-                </span>
-              </div>
-
-              {p.ingredientes.length === 0 && (
-                <p className="row-sub" style={{ margin: "8px 0 0" }}>
-                  Sin ingredientes capturados en la receta.
+      ) : (
+        <div className="grid-2 invertida">
+          <section className="panel sticky-top" aria-labelledby="titulo-comprar">
+            <div className="panel-head">
+              <div>
+                <h2 id="titulo-comprar">Por comprar</h2>
+                <p>
+                  {faltantes.length === 0
+                    ? "Con lo que hay alcanza para todo el menú."
+                    : faltantes.length === 1
+                      ? "1 ingrediente"
+                      : `${faltantes.length} ingredientes`}
                 </p>
-              )}
-
-              {p.ingredientes.map((ing) => (
-                <div className="row" key={ing.id}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="row-name">{ing.nombre}</div>
-                    <div className="row-sub">
-                      {fmt(ing.total)} {ing.unidad}
-                      {p.veces > 1 && (
-                        <span style={{ opacity: 0.7 }}>
-                          {" "}
-                          ({fmt(ing.por_vez)} × {p.veces})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <span
-                    className={`pill ${ing.cubierto ? "pill-ok" : "pill-warn"}`}
-                    title={
-                      ing.cubierto
-                        ? `Tienes ${fmt(disponible(ing.id))} ${ing.unidad} en el depa`
-                        : `Te faltan ${fmt(faltantePorId[ing.id] ?? 0)} ${ing.unidad} para toda la semana`
-                    }
-                  >
-                    {ing.cubierto ? "✓" : "falta"}
-                  </span>
-                </div>
-              ))}
+              </div>
             </div>
-          ))}
-        </>
+            {faltantes.length === 0 ? (
+              <div className="vacio">
+                <CircleCheck size={28} aria-hidden="true" />
+                <strong>No falta nada</strong>
+              </div>
+            ) : (
+              <ul className="lista">
+                {faltantes.map((item) => (
+                  <li key={item.id} className="compra-fila">
+                    <div className="fila-texto">
+                      <span className="fila-titulo">{item.nombre}</span>
+                      <span className="fila-sub num">
+                        Se necesitan {fmt(item.requerido)}, hay {fmt(item.disponible)}
+                      </span>
+                    </div>
+                    <span className="cantidad">
+                      {fmt(item.faltante)}
+                      <small>{item.unidad}</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section aria-labelledby="titulo-desglose" className="stack">
+            <h2 id="titulo-desglose" className="sr-only">
+              Por platillo
+            </h2>
+            {platillos.map((p) => (
+              <article className="panel" key={p.id}>
+                <div className="panel-head">
+                  <div>
+                    <h3>{p.nombre}</h3>
+                    <p>
+                      {p.dias.join(", ")}
+                      {p.veces > 1 && ` · ${p.veces} veces`}
+                    </p>
+                  </div>
+                </div>
+
+                {p.ingredientes.length === 0 ? (
+                  <p className="panel-body fila-sub">Esta receta no tiene ingredientes capturados.</p>
+                ) : (
+                  <ul className="lista">
+                    {p.ingredientes.map((ing) => {
+                      const hay = disponible(ing.id);
+                      return (
+                        <li key={ing.id} className="desglose-fila">
+                          <span>{ing.nombre}</span>
+                          <span className="cantidad">
+                            {fmt(ing.total)}
+                            <small>{ing.unidad}</small>
+                            {p.veces > 1 && (
+                              <span className="por-vez num"> ({fmt(ing.por_vez)} × {p.veces})</span>
+                            )}
+                          </span>
+                          <span
+                            className="icono-estado"
+                            data-falta={!ing.cubierto}
+                            title={
+                              ing.cubierto
+                                ? `Hay ${fmt(hay)} ${ing.unidad}`
+                                : `Hay ${fmt(hay)} ${ing.unidad}: no alcanza para la semana`
+                            }
+                          >
+                            {ing.cubierto ? (
+                              <CircleCheck size={16} aria-label="Alcanza" />
+                            ) : (
+                              <TriangleAlert size={16} aria-label="Falta" />
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </section>
+        </div>
       )}
-    </div>
+    </>
   );
 }
