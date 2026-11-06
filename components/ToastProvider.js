@@ -28,7 +28,7 @@ export default function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="toast-container">
+      <div className="toasts">
         {toasts.map((t) => (
           <Toast key={t.id} {...t} onClose={cerrar} />
         ))}
