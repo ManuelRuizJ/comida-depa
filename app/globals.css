@@ -1135,3 +1135,95 @@ input[type="number"] {
 .page {
   padding-bottom: 140px;
 }
+/* ============================================================ */
+/* Login                                                         */
+/* ============================================================ */
+body:has(.login-wrap) .nav {
+  display: none;
+}
+
+.login-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 6vh;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 24px;
+}
+
+.login-card h1 {
+  font-size: 1.7rem;
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  margin: 0 0 20px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.login-form label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.login-input {
+  position: relative;
+}
+
+.form-field .login-input input {
+  padding-right: 76px;
+  font-size: 1rem; /* 16px evita el zoom automático en iPhone */
+}
+
+.form-field .login-input input:focus {
+  outline: none;
+  border-color: var(--sage-500);
+  box-shadow: 0 0 0 3px var(--sage-100);
+}
+
+.login-ver {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: var(--sage-50);
+  color: var(--sage-700);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.login-error {
+  margin: 0 0 12px;
+}
+
+.login-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+  padding: 12px 18px;
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .login-wrap {
+    padding-top: 2vh;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+  }
+}
