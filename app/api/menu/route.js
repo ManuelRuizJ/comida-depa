@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 import { errorJson, leerJson } from "@/lib/api";
 import { DIAS_SEMANA } from "@/lib/fecha";
+import { diferenciasMenu } from "@/lib/menu-semana";
 
 // POST /api/menu — { dias: [{ dia, platillo_ids }] }
 //
@@ -25,27 +26,10 @@ export async function POST(request) {
   const { data: actuales, error: errActuales } = await supabase
     .from("menu_semana")
     .select("id, dia, platillo_id")
-    .in(
-      "dia",
-      dias.map((d) => d.dia)
-    );
+    .in("dia", dias.map((d) => d.dia));
   if (errActuales) return errorJson(errActuales.message);
 
-  const aBorrar = [];
-  const aCrear = [];
-
-  for (const { dia, platillo_ids } of dias) {
-    const elegidos = new Set(platillo_ids);
-    const delDia = actuales.filter((f) => f.dia === dia);
-    const yaEstan = new Set(delDia.map((f) => f.platillo_id));
-
-    delDia.forEach((f) => {
-      if (!elegidos.has(f.platillo_id)) aBorrar.push(f.id);
-    });
-    elegidos.forEach((platillo_id) => {
-      if (!yaEstan.has(platillo_id)) aCrear.push({ dia, platillo_id, comido: false });
-    });
-  }
+  const { aBorrar, aCrear } = diferenciasMenu(actuales, dias);
 
   if (aBorrar.length > 0) {
     const { error } = await supabase.from("menu_semana").delete().in("id", aBorrar);
