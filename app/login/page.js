@@ -1,4 +1,5 @@
 import LoginForm from "@/components/LoginForm";
+import Logo from "@/components/Logo";
 import { rutaSegura } from "@/lib/auth";
 
 export const metadata = { title: "Entrar" };
@@ -8,9 +9,14 @@ export default function LoginPage({ searchParams }) {
 
   return (
     <div className="login-wrap">
-      <div className="card login-card">
-        <h1>Hola de nuevo 👋</h1>
-        <p className="login-sub">Escribe la palabra clave para entrar a la cocina.</p>
+      <div className="panel login-card">
+        <header>
+          <Logo className="marca-logo login-logo" />
+          <div className="fila-texto">
+            <h1>Cocina Depa</h1>
+            <p>Escribe la palabra clave para entrar.</p>
+          </div>
+        </header>
         <LoginForm next={next} />
       </div>
     </div>
