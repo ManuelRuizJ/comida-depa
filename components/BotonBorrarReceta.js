@@ -30,10 +30,9 @@ export default function BotonBorrarReceta({ id, nombre }) {
 
   return (
     <button
-      className="btn btn-ghost"
+      className="btn btn-ghost btn-peligro"
       onClick={borrar}
       disabled={borrando}
-      style={{ color: "#b03a2e" }}
     >
       {borrando ? "..." : "Borrar"}
     </button>
