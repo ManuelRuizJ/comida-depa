@@ -3,39 +3,59 @@ import { NextResponse } from "next/server";
 import { errorJson, leerJson } from "@/lib/api";
 import { DIAS_SEMANA } from "@/lib/fecha";
 
+// POST /api/menu — { dias: [{ dia, platillo_ids }] }
+//
+// Solo agrega lo nuevo y quita lo que se deseleccionó. Lo que se queda
+// conserva su estado de "comido": borrarlo y volverlo a crear lo
+// regresaría a pendiente y su receta se descontaría dos veces del inventario.
 export async function POST(request) {
   const body = await leerJson(request);
   const dias = body?.dias;
 
   if (!Array.isArray(dias)) {
-    return NextResponse.json({ error: "Formato inválido" }, { status: 400 });
+    return errorJson("Formato inválido", 400);
   }
+
+  for (const d of dias) {
+    if (!DIAS_SEMANA.includes(d?.dia) || !Array.isArray(d.platillo_ids)) {
+      return errorJson(`Día inválido: ${d?.dia}`, 400);
+    }
+  }
+
+  const { data: actuales, error: errActuales } = await supabase
+    .from("menu_semana")
+    .select("id, dia, platillo_id")
+    .in(
+      "dia",
+      dias.map((d) => d.dia)
+    );
+  if (errActuales) return errorJson(errActuales.message);
+
+  const aBorrar = [];
+  const aCrear = [];
 
   for (const { dia, platillo_ids } of dias) {
-    if (!DIAS_SEMANA.includes(dia) || !Array.isArray(platillo_ids)) {
-      return NextResponse.json({ error: `Día inválido: ${dia}` }, { status: 400 });
-    }
+    const elegidos = new Set(platillo_ids);
+    const delDia = actuales.filter((f) => f.dia === dia);
+    const yaEstan = new Set(delDia.map((f) => f.platillo_id));
 
-    // Limpia lo que había ese día y mete la selección nueva.
-    // (En Postgres esto podría ser una transacción; para 2 usuarios
-    // y ~5 filas por día, el riesgo de condición de carrera es mínimo.)
-    const { error: deleteError } = await supabase.from("menu_semana").delete().eq("dia", dia);
-    if (deleteError) {
-      return NextResponse.json({ error: deleteError.message }, { status: 500 });
-    }
-
-    if (platillo_ids.length > 0) {
-      const filas = platillo_ids.map((platillo_id) => ({
-        dia,
-        platillo_id,
-        comido: false,
-      }));
-      const { error: insertError } = await supabase.from("menu_semana").insert(filas);
-      if (insertError) {
-        return NextResponse.json({ error: insertError.message }, { status: 500 });
-      }
-    }
+    delDia.forEach((f) => {
+      if (!elegidos.has(f.platillo_id)) aBorrar.push(f.id);
+    });
+    elegidos.forEach((platillo_id) => {
+      if (!yaEstan.has(platillo_id)) aCrear.push({ dia, platillo_id, comido: false });
+    });
   }
 
-  return NextResponse.json({ ok: true });
+  if (aBorrar.length > 0) {
+    const { error } = await supabase.from("menu_semana").delete().in("id", aBorrar);
+    if (error) return errorJson(error.message);
+  }
+
+  if (aCrear.length > 0) {
+    const { error } = await supabase.from("menu_semana").insert(aCrear);
+    if (error) return errorJson(error.message);
+  }
+
+  return NextResponse.json({ ok: true, agregados: aCrear.length, quitados: aBorrar.length });
 }

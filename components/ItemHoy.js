@@ -29,8 +29,13 @@ export default function ItemHoy({ item }) {
       return;
     }
 
+    const { ajustados = 0 } = await res.json().catch(() => ({}));
     setComido(valor);
-    toast(valor ? "¡Buen provecho!" : "Marcado como pendiente");
+    if (ajustados > 0) {
+      toast(valor ? "Comido. Se descontó del inventario" : "Pendiente. Se regresó al inventario");
+    } else {
+      toast(valor ? "Marcado como comido" : "Marcado como pendiente");
+    }
     router.refresh();
   }
 

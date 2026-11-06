@@ -38,7 +38,7 @@ export default async function ComprasPage() {
     <div>
       <h1>Lista de compras</h1>
       <p className="row-sub">
-        Calculada del menú de la semana menos lo que ya hay en el depa.
+        Lo que falta para los platillos pendientes de la semana, descontando lo que ya hay.
       </p>
 
       {platillos.length === 0 && (
