@@ -1301,3 +1301,41 @@ body:has(.login-wrap) .nav {
   color: var(--mustard-700);
   border-color: var(--mustard-300);
 }
+
+/* ============================================================ */
+/* Hoy                                                           */
+/* ============================================================ */
+.item-hoy {
+  border-bottom: 1px solid var(--line);
+}
+
+.item-hoy:last-child {
+  border-bottom: none;
+}
+
+.item-hoy .row {
+  border-bottom: none;
+}
+
+.item-hoy-receta {
+  padding: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.item-hoy-receta summary {
+  cursor: pointer;
+  width: fit-content;
+  font-weight: 500;
+  color: var(--sage-700);
+}
+
+.item-hoy-receta ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.spinner-oscuro {
+  border-color: var(--sage-100);
+  border-top-color: var(--sage-700);
+}
