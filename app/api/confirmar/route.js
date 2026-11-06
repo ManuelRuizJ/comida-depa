@@ -1,5 +1,7 @@
-import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { marcarComido } from "@/lib/menu";
+
+// GET /api/confirmar?id=...&comido=true — link del correo diario
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -10,10 +12,7 @@ export async function GET(request) {
     return new NextResponse("Faltan parámetros", { status: 400 });
   }
 
-  const { error } = await supabase
-    .from("menu_semana")
-    .update({ comido: comido === "true" })
-    .eq("id", id);
+  const { error } = await marcarComido(id, comido === "true");
 
   if (error) {
     return new NextResponse(`Error: ${error.message}`, { status: 500 });
