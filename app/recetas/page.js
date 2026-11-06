@@ -1,66 +1,42 @@
-import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import RecetaForm from "@/components/RecetaForm";
-import BotonBorrarReceta from "@/components/BotonBorrarReceta";
-
-export const metadata = { title: "Recetas" };
+import { Plus } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import ListaRecetas from "@/components/ListaRecetas";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Recetas" };
 
 export default async function RecetasPage() {
-  const [{ data: platillos }, { data: catalogo }] = await Promise.all([
-    supabase
-      .from("platillos")
-      .select(
-        "id, nombre, categoria, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(nombre, unidad))"
-      )
-      .order("nombre"),
-    supabase.from("ingredientes").select("nombre, unidad").order("nombre"),
-  ]);
+  const { data: platillos, error } = await supabase
+    .from("platillos")
+    .select(
+      "id, nombre, categoria, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(nombre, unidad))"
+    )
+    .order("nombre");
+
+  if (error) {
+    throw new Error(`No se pudieron cargar las recetas: ${error.message}`);
+  }
 
   return (
-    <div>
-      <h1>Recetas</h1>
-
-      <div className="card">
-        <h2>Agregar receta</h2>
-        <RecetaForm catalogo={catalogo || []} />
-      </div>
-
-      <h2 style={{ marginTop: 28 }}>
-        Ya guardadas ({platillos?.length || 0})
-      </h2>
-      {(!platillos || platillos.length === 0) && (
-        <p className="empty">Todavía no hay recetas.</p>
-      )}
-      {platillos?.map((p) => (
-        <div className="card" key={p.id}>
-          <div className="receta-header">
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h2>{p.nombre}</h2>
-              <p className="row-sub" style={{ margin: 0 }}>
-                {p.categoria} · {p.tiempo_min} min
-              </p>
-            </div>
-            <div className="receta-acciones">
-              <Link href={`/recetas/${p.id}`} className="btn btn-secondary">
-                Editar
-              </Link>
-              <BotonBorrarReceta id={p.id} nombre={p.nombre} />
-            </div>
-          </div>
-          {p.receta_ingredientes.length > 0 && (
-            <ul style={{ margin: "12px 0 0", paddingLeft: 20 }}>
-              {p.receta_ingredientes.map((ri, i) => (
-                <li key={i} className="row-sub">
-                  {ri.ingredientes?.nombre} — {ri.cantidad_requerida}{" "}
-                  {ri.ingredientes?.unidad}
-                </li>
-              ))}
-            </ul>
-          )}
+    <>
+      <header className="page-head">
+        <div>
+          <h1>Recetas</h1>
+          <p className="page-sub">
+            Cada receta dice qué ingredientes usa y cuánto. De aquí salen la lista de compras y lo que se
+            descuenta del inventario.
+          </p>
         </div>
-      ))}
-    </div>
+        <div className="page-acciones">
+          <Link href="/recetas/nueva" className="btn btn-primary">
+            <Plus size={16} aria-hidden="true" />
+            Nueva receta
+          </Link>
+        </div>
+      </header>
+
+      <ListaRecetas platillos={platillos} />
+    </>
   );
 }
