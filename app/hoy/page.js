@@ -14,7 +14,9 @@ export default async function HoyPage() {
   if (esDiaDeSemana) {
     const { data } = await supabase
       .from("menu_semana")
-      .select("id, comido, platillos(nombre)")
+      .select(
+        "id, comido, platillos(nombre, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(nombre, unidad)))"
+      )
       .eq("dia", hoy);
     items = data || [];
   }
