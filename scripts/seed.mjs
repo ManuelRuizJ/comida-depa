@@ -13,12 +13,7 @@
  *   npm run seed
  */
 
-import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-
-dotenv.config({ path: ".env.local" });
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+import { supabase } from "./lib/supabase.mjs";
 
 // ============================================================
 // 1. EDITA AQUÍ TUS RECETAS (copiado y traducido de tu Notion)

@@ -1,6 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
+// Sábado: la lista de compras de la semana (menú menos inventario).
+
+import { supabase } from "./lib/supabase.mjs";
+import { BASE_URL, COLOR, boton, correr, enviarCorreo, escapar, plantilla } from "./lib/correo.mjs";
 import { DIAS_SEMANA } from "../lib/fecha.mjs";
 import {
   SELECT_INVENTARIO_COMPRAS,
@@ -8,21 +9,6 @@ import {
   calcularCompras,
   formatearCantidad as fmt,
 } from "../lib/compras.mjs";
-
-dotenv.config({ path: ".env.local" });
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
 
 async function main() {
   const [{ data: menu, error: errMenu }, { data: inventario, error: errInv }] =
@@ -41,55 +27,27 @@ async function main() {
     return;
   }
 
-  const baseUrl = process.env.APP_URL || "https://comida-depa-rh8t.vercel.app";
-
   const itemsHtml = porComprar
     .map(
       (item) => `
-      <div style="border-bottom: 1px solid #dde3d4; padding: 10px 0;">
-        <div style="color: #223226; font-weight: 500;">${item.nombre}</div>
-        <div style="color: #55655a; font-size: 0.9rem;">
-          Necesitas ${fmt(item.requerido)} ${item.unidad} · tienes ${fmt(item.disponible)}
-          → <strong style="color: #a67322;">comprar ${fmt(item.faltante)} ${item.unidad}</strong>
+      <div style="border-bottom: 1px solid ${COLOR.line}; padding: 10px 0;">
+        <div style="color: ${COLOR.ink}; font-weight: 500;">${escapar(item.nombre)}</div>
+        <div style="color: ${COLOR.inkSoft}; font-size: 0.9rem;">
+          Necesitas ${fmt(item.requerido)} ${escapar(item.unidad)} · tienes ${fmt(item.disponible)}
+          → <strong style="color: ${COLOR.mustard700};">comprar ${fmt(item.faltante)} ${escapar(item.unidad)}</strong>
         </div>
       </div>`
     )
     .join("");
 
-  const html = `
-    <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <h1 style="font-family: Georgia, serif; color: #223226; font-size: 1.5rem;">
-        Lista de compras de la semana
-      </h1>
-      <p style="color: #55655a; margin-bottom: 16px;">
-        Calculada del menú de esta semana menos lo que ya tienen en el depa:
-      </p>
-      ${itemsHtml}
-      <a href="${baseUrl}/compras"
-         style="display: inline-block; background: #3f5636; color: white; text-decoration: none;
-                padding: 12px 22px; border-radius: 999px; font-weight: 600; margin-top: 20px;">
-        Ver lista completa
-      </a>
-    </div>`;
-
-  const result = await transporter.sendMail({
-    from: `"Cocina Depa" <${process.env.GMAIL_USER}>`,
-    to: getDestinatarios(),
-    subject: `🛒 Lista de compras (${porComprar.length} cosa${porComprar.length === 1 ? "" : "s"})`,
-    html,
+  await enviarCorreo({
+    asunto: `🛒 Lista de compras (${porComprar.length} cosa${porComprar.length === 1 ? "" : "s"})`,
+    html: plantilla({
+      titulo: "Lista de compras de la semana",
+      intro: "Calculada del menú de esta semana menos lo que ya tienen en el depa:",
+      contenido: itemsHtml + `<div style="margin-top: 20px;">${boton(`${BASE_URL}/compras`, "Ver lista completa")}</div>`,
+    }),
   });
-
-  console.log("Correo enviado:", result.messageId);
 }
 
-function getDestinatarios() {
-  return (process.env.EMAIL_TO || "")
-    .split(",")
-    .map((e) => e.trim())
-    .filter(Boolean);
-}
-
-main().catch((err) => {
-  console.error("Error:", err);
-  process.exit(1);
-});
+correr(main);
