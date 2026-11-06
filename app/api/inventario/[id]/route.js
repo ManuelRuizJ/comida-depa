@@ -38,10 +38,7 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   const { id } = params;
 
-  const { error } = await supabase
-    .from("ingredientes")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("ingredientes").delete().eq("id", id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

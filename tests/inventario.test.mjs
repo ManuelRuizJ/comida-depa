@@ -21,7 +21,11 @@ test("descontar una receta nunca deja negativos", () => {
 });
 
 test("deshacer regresa las cantidades", () => {
-  const ajustes = ajustarPorComido([{ ingrediente_id: "l", cantidad_requerida: 0.1 }], { l: 0.2 }, 1);
+  const ajustes = ajustarPorComido(
+    [{ ingrediente_id: "l", cantidad_requerida: 0.1 }],
+    { l: 0.2 },
+    1
+  );
   assert.deepEqual(ajustes, [{ ingrediente_id: "l", cantidad_actual: 0.3 }]);
 });
 

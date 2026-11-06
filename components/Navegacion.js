@@ -25,12 +25,12 @@ export default function Navegacion({ variante }) {
   return (
     <nav className={lateral ? "sidebar-nav" : "tabbar"} aria-label="Secciones">
       {SECCIONES.map(({ href, texto, Icono }) => (
-        <Link
-          key={href}
-          href={href}
-          aria-current={estaActiva(pathname, href) ? "page" : undefined}
-        >
-          <Icono size={lateral ? 18 : 22} strokeWidth={estaActiva(pathname, href) ? 2.25 : 1.75} aria-hidden="true" />
+        <Link key={href} href={href} aria-current={estaActiva(pathname, href) ? "page" : undefined}>
+          <Icono
+            size={lateral ? 18 : 22}
+            strokeWidth={estaActiva(pathname, href) ? 2.25 : 1.75}
+            aria-hidden="true"
+          />
           {texto}
         </Link>
       ))}

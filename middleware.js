@@ -20,8 +20,7 @@ export async function middleware(request) {
   // del navegador (p. ej. el link de confirmación del correo), se manda al
   // login y al entrar regresa al mismo link.
   const esNavegacion =
-    request.method === "GET" &&
-    (request.headers.get("accept") || "").includes("text/html");
+    request.method === "GET" && (request.headers.get("accept") || "").includes("text/html");
 
   if (pathname.startsWith("/api/") && !esNavegacion) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });

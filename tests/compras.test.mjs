@@ -78,6 +78,8 @@ test("menú vacío no truena", () => {
 });
 
 test("listaComoTexto arma una lista lista para compartir", () => {
-  const texto = listaComoTexto([{ nombre: "Leche", faltante: 0.30000000000000004, unidad: "litros" }]);
+  const texto = listaComoTexto([
+    { nombre: "Leche", faltante: 0.30000000000000004, unidad: "litros" },
+  ]);
   assert.match(texto, /Leche: 0\.3 litros/);
 });

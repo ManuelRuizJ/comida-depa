@@ -35,17 +35,15 @@ export async function POST(request) {
     return NextResponse.json({ error: errIng.message }, { status: 500 });
   }
 
-  const { error: errInv } = await supabase
-    .from("inventario")
-    .upsert(
-      {
-        ingrediente_id: ingrediente.id,
-        cantidad_actual: Number(cantidad_actual) || 0,
-        cantidad_minima: Number(cantidad_minima) || 1,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "ingrediente_id" }
-    );
+  const { error: errInv } = await supabase.from("inventario").upsert(
+    {
+      ingrediente_id: ingrediente.id,
+      cantidad_actual: Number(cantidad_actual) || 0,
+      cantidad_minima: Number(cantidad_minima) || 1,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "ingrediente_id" }
+  );
 
   if (errInv) {
     return NextResponse.json({ error: errInv.message }, { status: 500 });

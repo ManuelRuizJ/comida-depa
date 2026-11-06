@@ -39,7 +39,9 @@ async function main() {
     html: plantilla({
       titulo,
       intro: "Esto está por debajo del mínimo en el depa:",
-      contenido: itemsHtml + `<div style="margin-top: 20px;">${boton(`${BASE_URL}/inventario`, "Ver inventario")}</div>`,
+      contenido:
+        itemsHtml +
+        `<div style="margin-top: 20px;">${boton(`${BASE_URL}/inventario`, "Ver inventario")}</div>`,
     }),
   });
 }

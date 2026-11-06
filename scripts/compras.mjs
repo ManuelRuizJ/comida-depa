@@ -11,11 +11,10 @@ import {
 } from "../lib/compras.mjs";
 
 async function main() {
-  const [{ data: menu, error: errMenu }, { data: inventario, error: errInv }] =
-    await Promise.all([
-      supabase.from("menu_semana").select(SELECT_MENU_COMPRAS).in("dia", DIAS_SEMANA),
-      supabase.from("inventario_con_estado").select(SELECT_INVENTARIO_COMPRAS),
-    ]);
+  const [{ data: menu, error: errMenu }, { data: inventario, error: errInv }] = await Promise.all([
+    supabase.from("menu_semana").select(SELECT_MENU_COMPRAS).in("dia", DIAS_SEMANA),
+    supabase.from("inventario_con_estado").select(SELECT_INVENTARIO_COMPRAS),
+  ]);
 
   if (errMenu) throw errMenu;
   if (errInv) throw errInv;
@@ -45,7 +44,9 @@ async function main() {
     html: plantilla({
       titulo: "Lista de compras de la semana",
       intro: "Calculada del menú de esta semana menos lo que ya tienen en el depa:",
-      contenido: itemsHtml + `<div style="margin-top: 20px;">${boton(`${BASE_URL}/compras`, "Ver lista completa")}</div>`,
+      contenido:
+        itemsHtml +
+        `<div style="margin-top: 20px;">${boton(`${BASE_URL}/compras`, "Ver lista completa")}</div>`,
     }),
   });
 }

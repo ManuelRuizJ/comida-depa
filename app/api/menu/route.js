@@ -26,7 +26,10 @@ export async function POST(request) {
   const { data: actuales, error: errActuales } = await supabase
     .from("menu_semana")
     .select("id, dia, platillo_id")
-    .in("dia", dias.map((d) => d.dia));
+    .in(
+      "dia",
+      dias.map((d) => d.dia)
+    );
   if (errActuales) return errorJson(errActuales.message);
 
   const { aBorrar, aCrear } = diferenciasMenu(actuales, dias);

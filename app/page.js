@@ -39,7 +39,8 @@ export default async function InicioPage() {
   if (!laborable) resumen = "No se cocina en el depa hoy. El menú de la semana sigue abajo.";
   else if (deHoy.length === 0) resumen = "Todavía no hay nada asignado para hoy.";
   else if (pendientes === 0) resumen = "Todo lo de hoy ya está marcado como comido.";
-  else resumen = `${plural(pendientes, "platillo pendiente", "platillos pendientes")} de ${deHoy.length}.`;
+  else
+    resumen = `${plural(pendientes, "platillo pendiente", "platillos pendientes")} de ${deHoy.length}.`;
 
   return (
     <>
@@ -70,7 +71,9 @@ export default async function InicioPage() {
           ) : (
             <div className="vacio">
               <strong>{laborable ? "Nada asignado para hoy" : "Hoy no hay plan"}</strong>
-              <p>{laborable ? "Agrega platillos desde el menú." : "El menú es de lunes a viernes."}</p>
+              <p>
+                {laborable ? "Agrega platillos desde el menú." : "El menú es de lunes a viernes."}
+              </p>
               <Link href="/menu" className="btn btn-secondary btn-sm">
                 Ir al menú
               </Link>
@@ -86,7 +89,9 @@ export default async function InicioPage() {
             </div>
             <div className="resumen-num">
               <strong>{faltantes.length}</strong>
-              <span>{faltantes.length === 1 ? "ingrediente falta" : "ingredientes faltan"} para el menú</span>
+              <span>
+                {faltantes.length === 1 ? "ingrediente falta" : "ingredientes faltan"} para el menú
+              </span>
             </div>
             {faltantes.length > 0 && (
               <ul className="lista">

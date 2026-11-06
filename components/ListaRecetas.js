@@ -55,7 +55,12 @@ export default function ListaRecetas({ platillos }) {
           {["Todas", ...CATEGORIAS_PLATILLO]
             .filter((c) => conteo[c])
             .map((c) => (
-              <button key={c} type="button" aria-pressed={categoria === c} onClick={() => setCategoria(c)}>
+              <button
+                key={c}
+                type="button"
+                aria-pressed={categoria === c}
+                onClick={() => setCategoria(c)}
+              >
                 {c}
                 <span className="conteo">{conteo[c]}</span>
               </button>

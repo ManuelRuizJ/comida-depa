@@ -55,7 +55,12 @@ export default function ModalPlatillos({ dia, platillos, seleccionados, onToggle
               {seleccionados.size === 1 ? "1 seleccionado" : `${seleccionados.size} seleccionados`}
             </p>
           </div>
-          <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Cerrar">
+          <button
+            type="button"
+            className="btn btn-ghost btn-icon"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
             <X size={18} aria-hidden="true" />
           </button>
         </div>
@@ -75,7 +80,12 @@ export default function ModalPlatillos({ dia, platillos, seleccionados, onToggle
           </label>
           <div className="segmented" role="group" aria-label="Categoría">
             {CATEGORIAS.filter((c) => conteo[c]).map((c) => (
-              <button key={c} type="button" aria-pressed={categoria === c} onClick={() => setCategoria(c)}>
+              <button
+                key={c}
+                type="button"
+                aria-pressed={categoria === c}
+                onClick={() => setCategoria(c)}
+              >
                 {c}
                 <span className="conteo">{conteo[c]}</span>
               </button>
