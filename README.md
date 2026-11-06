@@ -4,10 +4,29 @@ Frontend en Next.js + Supabase, reemplaza Notion + Render.
 
 ## Estructura
 
-- `app/` — páginas (Hoy, Menú, Inventario) y API routes
-- `lib/supabase.js` — cliente de Supabase, solo se usa en el servidor
-- `components/` — piezas interactivas (chips de menú, filas editables)
-- `supabase/schema.sql` — el esquema que ya corriste en Supabase
+- `app/` — páginas (Hoy, Menú, Inventario, Compras, Recetas) y API routes
+- `components/` — piezas interactivas (chips de menú, filas editables, formularios)
+- `lib/` — código compartido:
+  - `supabase.js` — cliente de Supabase, solo se usa en el servidor
+  - `auth.js` — sesión con palabra clave
+  - `api.js` — helpers de las API routes (`leerJson`, `errorJson`)
+  - `constantes.js` — categorías y unidades
+  - `fecha.mjs` — qué día es hoy, siempre con la hora de México
+  - `compras.mjs` — cálculo de la lista de compras (lo usan la página y el correo)
+- `scripts/` — correos automáticos (GitHub Actions), `seed` y `dedup`
+  - `scripts/lib/` — envío por Gmail, plantilla del correo y cliente de Supabase
+
+`fecha.mjs` y `compras.mjs` son `.mjs` para que los scripts de node también
+los puedan importar.
+
+## Probar un correo sin mandarlo
+
+```bash
+node scripts/diario.mjs --mostrar   # también alertas, compras, menu_semanal
+```
+
+Arma el correo con los datos reales pero no lo envía: imprime la ruta de un
+`.html` temporal para abrirlo en el navegador.
 
 ## Correr en tu compu (opcional, para probar antes de subir)
 
@@ -52,7 +71,3 @@ La app pide una palabra clave (`APP_PASSWORD`) antes de dejar ver o modificar cu
 - **Server components** (`app/*/page.js`) leen datos directo de Supabase en el servidor — más rápido, y las credenciales nunca llegan al navegador.
 - **API routes** (`app/api/*/route.js`) manejan las escrituras (guardar menú, marcar comido, actualizar inventario) — mismo patrón que antes con Flask, pero sin servidor que se duerma.
 - **Componentes cliente** (`"use client"`) solo donde hace falta interactividad (chips, botones) — el resto es HTML generado en servidor, más rápido de cargar.
-
-## Siguiente paso
-
-Todavía falta: cargar los datos reales (ingredientes, platillos, recetas) y conectar los correos automáticos (GitHub Actions + Resend) a esta base nueva en vez de Notion.
