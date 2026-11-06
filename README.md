@@ -33,8 +33,19 @@ Abre `http://localhost:3000`.
 3. Vercel detecta que es Next.js automáticamente. Antes de darle "Deploy", abre "Environment Variables" y agrega:
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
+   - `APP_PASSWORD` (la palabra clave para entrar)
    (los mismos valores de tu `.env.local`)
 4. Dale "Deploy". En 1-2 minutos tienes una URL pública tipo `cocina-depa-web.vercel.app`.
+
+## Acceso con palabra clave
+
+La app pide una palabra clave (`APP_PASSWORD`) antes de dejar ver o modificar cualquier cosa.
+
+- Se escribe una vez por dispositivo y queda recordada **1 año** (cookie `httpOnly`).
+- No distingue mayúsculas ni espacios al inicio/final.
+- **Cambiar `APP_PASSWORD` en Vercel cierra la sesión en todos los dispositivos** (hay que redeployar para que tome el valor nuevo).
+- `middleware.js` protege todas las páginas y `/api/*`; los links del correo diario mandan al login y, al entrar, regresan al link.
+- Los scripts de GitHub Actions hablan directo con Supabase, no les afecta.
 
 ## Por qué esta estructura
 
