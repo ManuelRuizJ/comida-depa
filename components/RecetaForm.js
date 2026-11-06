@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 import { CATEGORIAS_PLATILLO as CATEGORIAS, UNIDADES } from "@/lib/constantes";
+import { claveNombre } from "@/lib/ingredientes";
 
 const filaVacia = () => ({ nombre: "", cantidad: "", unidad: "piezas" });
 
 // Sirve para crear (sin `receta`) y para editar (con `receta`).
-export default function RecetaForm({ receta }) {
+// `catalogo` son los ingredientes que ya existen: se sugieren al escribir y,
+// si se elige uno, se usa su unidad (es la que lleva el inventario).
+export default function RecetaForm({ receta, catalogo = [] }) {
   const editando = Boolean(receta?.id);
   const { toast } = useToast();
   const router = useRouter();
@@ -17,10 +20,15 @@ export default function RecetaForm({ receta }) {
   const [categoria, setCategoria] = useState(receta?.categoria ?? "Comida");
   const [tiempo, setTiempo] = useState(receta?.tiempo ?? 20);
   const [ingredientes, setIngredientes] = useState(
-    receta?.ingredientes?.length ? receta.ingredientes : [filaVacia()]
+    receta?.ingredientes?.length ? receta.ingredientes : [filaVacia()],
   );
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+
+  const catalogoPorClave = useMemo(
+    () => new Map(catalogo.map((i) => [claveNombre(i.nombre), i])),
+    [catalogo],
+  );
 
   function actualizarIngrediente(i, campo, valor) {
     setIngredientes((prev) => {
@@ -55,7 +63,7 @@ export default function RecetaForm({ receta }) {
     }
 
     const ingredientesValidos = ingredientes.filter(
-      (i) => i.nombre.trim() && Number(i.cantidad) > 0
+      (i) => i.nombre.trim() && Number(i.cantidad) > 0,
     );
 
     setGuardando(true);
@@ -116,58 +124,64 @@ export default function RecetaForm({ receta }) {
         </div>
         <div className="form-field">
           <label className="row-sub">Tiempo (min)</label>
-          <input
-            type="number"
-            min="0"
-            value={tiempo}
-            onChange={(e) => setTiempo(e.target.value)}
-          />
+          <input type="number" min="0" value={tiempo} onChange={(e) => setTiempo(e.target.value)} />
         </div>
       </div>
 
       <label className="row-sub">Ingredientes</label>
-      {ingredientes.map((ing, i) => (
-        <div key={i} className="ingrediente-row">
-          <input
-            type="text"
-            placeholder="Ingrediente"
-            value={ing.nombre}
-            onChange={(e) => actualizarIngrediente(i, "nombre", e.target.value)}
-            className="ing-nombre"
-          />
-          <input
-            type="number"
-            min="0"
-            step="any"
-            placeholder="Cant."
-            value={ing.cantidad}
-            onChange={(e) => actualizarIngrediente(i, "cantidad", e.target.value)}
-            className="ing-cantidad"
-          />
-          <select
-            value={ing.unidad}
-            onChange={(e) => actualizarIngrediente(i, "unidad", e.target.value)}
-            className="ing-unidad"
-          >
-            {/* Si el ingrediente ya tenía una unidad fuera de la lista, se respeta. */}
-            {(UNIDADES.includes(ing.unidad) ? UNIDADES : [ing.unidad, ...UNIDADES]).map(
-              (u) => (
+      <datalist id="catalogo-ingredientes">
+        {catalogo.map((i) => (
+          <option key={i.nombre} value={i.nombre} />
+        ))}
+      </datalist>
+      {ingredientes.map((ing, i) => {
+        const existente = catalogoPorClave.get(claveNombre(ing.nombre));
+        const unidad = existente?.unidad ?? ing.unidad;
+        return (
+          <div key={i} className="ingrediente-row">
+            <input
+              type="text"
+              placeholder="Ingrediente"
+              list="catalogo-ingredientes"
+              autoComplete="off"
+              value={ing.nombre}
+              onChange={(e) => actualizarIngrediente(i, "nombre", e.target.value)}
+              className="ing-nombre"
+            />
+            <input
+              type="number"
+              min="0"
+              step="any"
+              placeholder="Cant."
+              value={ing.cantidad}
+              onChange={(e) => actualizarIngrediente(i, "cantidad", e.target.value)}
+              className="ing-cantidad"
+            />
+            <select
+              value={unidad}
+              onChange={(e) => actualizarIngrediente(i, "unidad", e.target.value)}
+              className="ing-unidad"
+              disabled={Boolean(existente)}
+              title={existente ? "Unidad del inventario" : undefined}
+            >
+              {/* Si el ingrediente ya tenía una unidad fuera de la lista, se respeta. */}
+              {(UNIDADES.includes(unidad) ? UNIDADES : [unidad, ...UNIDADES]).map((u) => (
                 <option key={u} value={u}>
                   {u}
                 </option>
-              )
-            )}
-          </select>
-          <button
-            type="button"
-            className="btn btn-ghost btn-quitar"
-            onClick={() => quitarFila(i)}
-            aria-label="Quitar ingrediente"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
+              ))}
+            </select>
+            <button
+              type="button"
+              className="btn btn-ghost btn-quitar"
+              onClick={() => quitarFila(i)}
+              aria-label="Quitar ingrediente"
+            >
+              ✕
+            </button>
+          </div>
+        );
+      })}
 
       <button
         type="button"
@@ -191,11 +205,7 @@ export default function RecetaForm({ receta }) {
           )}
         </button>
         {editando && (
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => router.push("/recetas")}
-          >
+          <button type="button" className="btn btn-ghost" onClick={() => router.push("/recetas")}>
             Cancelar
           </button>
         )}

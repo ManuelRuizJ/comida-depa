@@ -8,12 +8,15 @@ export const metadata = { title: "Recetas" };
 export const dynamic = "force-dynamic";
 
 export default async function RecetasPage() {
-  const { data: platillos } = await supabase
-    .from("platillos")
-    .select(
-      "id, nombre, categoria, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(nombre, unidad))"
-    )
-    .order("nombre");
+  const [{ data: platillos }, { data: catalogo }] = await Promise.all([
+    supabase
+      .from("platillos")
+      .select(
+        "id, nombre, categoria, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(nombre, unidad))"
+      )
+      .order("nombre"),
+    supabase.from("ingredientes").select("nombre, unidad").order("nombre"),
+  ]);
 
   return (
     <div>
@@ -21,7 +24,7 @@ export default async function RecetasPage() {
 
       <div className="card">
         <h2>Agregar receta</h2>
-        <RecetaForm />
+        <RecetaForm catalogo={catalogo || []} />
       </div>
 
       <h2 style={{ marginTop: 28 }}>

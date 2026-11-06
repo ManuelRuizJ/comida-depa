@@ -6,13 +6,16 @@ import RecetaForm from "@/components/RecetaForm";
 export const dynamic = "force-dynamic";
 
 export default async function EditarRecetaPage({ params }) {
-  const { data: platillo, error } = await supabase
-    .from("platillos")
-    .select(
-      "id, nombre, categoria, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(id, nombre, unidad))"
-    )
-    .eq("id", params.id)
-    .single();
+  const [{ data: platillo, error }, { data: catalogo }] = await Promise.all([
+    supabase
+      .from("platillos")
+      .select(
+        "id, nombre, categoria, tiempo_min, receta_ingredientes(cantidad_requerida, ingredientes(id, nombre, unidad))"
+      )
+      .eq("id", params.id)
+      .single(),
+    supabase.from("ingredientes").select("nombre, unidad").order("nombre"),
+  ]);
 
   if (error || !platillo) {
     notFound();
@@ -36,6 +39,7 @@ export default async function EditarRecetaPage({ params }) {
       <h1>Editar receta</h1>
       <div className="card">
         <RecetaForm
+          catalogo={catalogo || []}
           receta={{
             id: platillo.id,
             nombre: platillo.nombre,
