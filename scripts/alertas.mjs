@@ -3,6 +3,7 @@
 import { supabase } from "./lib/supabase.mjs";
 import { BASE_URL, COLOR, boton, correr, enviarCorreo, escapar, plantilla } from "./lib/correo.mjs";
 import { formatearCantidad as fmt } from "../lib/compras.mjs";
+import { necesitaComprar } from "../lib/inventario.mjs";
 
 async function main() {
   const { data: items, error } = await supabase
@@ -12,7 +13,7 @@ async function main() {
 
   if (error) throw error;
 
-  const faltantes = (items || []).filter((i) => i.estado?.includes("Comprar"));
+  const faltantes = (items || []).filter(necesitaComprar);
 
   if (faltantes.length === 0) {
     console.log("No hay nada por comprar. Saliendo sin mandar correo.");

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 import FilaInventario from "./FilaInventario";
+import { necesitaComprar } from "@/lib/inventario";
 
 export default function ListaInventario({ items, usosPorIngrediente }) {
   const router = useRouter();
@@ -90,12 +91,12 @@ export default function ListaInventario({ items, usosPorIngrediente }) {
     const q = busqueda.trim().toLowerCase();
     return items.filter((item) => {
       if (q && !item.nombre.toLowerCase().includes(q)) return false;
-      if (filtro === "faltantes" && !item.estado.includes("Comprar")) return false;
+      if (filtro === "faltantes" && !necesitaComprar(item)) return false;
       return true;
     });
   }, [items, busqueda, filtro]);
 
-  const totalFaltantes = items.filter((i) => i.estado.includes("Comprar")).length;
+  const totalFaltantes = items.filter(necesitaComprar).length;
 
   return (
     <div>

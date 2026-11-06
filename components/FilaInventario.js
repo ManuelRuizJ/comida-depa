@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
+import { necesitaComprar } from "@/lib/inventario";
 
 export default function FilaInventario({
   item,
@@ -15,7 +16,7 @@ export default function FilaInventario({
   const { toast } = useToast();
   const [borrando, setBorrando] = useState(false);
 
-  const faltante = item.estado.includes("Comprar");
+  const faltante = necesitaComprar(item);
   const cambiado =
     Number(valores.cantidad_actual) !== Number(item.cantidad_actual) ||
     Number(valores.cantidad_minima) !== Number(item.cantidad_minima);
@@ -55,7 +56,7 @@ export default function FilaInventario({
 
       <div className="fila-controles">
         <span className={`pill ${faltante ? "pill-warn" : "pill-ok"}`}>
-          {item.estado}
+          {faltante ? "Comprar" : "Disponible"}
         </span>
 
         <div className="inv-inputs">
