@@ -116,7 +116,7 @@ export default function NuevoIngredienteForm() {
       </div>
 
       {error && (
-        <p style={{ color: "#b03a2e", marginTop: 12, fontSize: "0.9rem" }}>{error}</p>
+        <p className="texto-error">{error}</p>
       )}
 
       <div style={{ marginTop: 16, display: "flex", gap: 10 }}>

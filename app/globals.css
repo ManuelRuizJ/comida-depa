@@ -6,6 +6,7 @@
   --sage-700: #3f5636;
   --sage-900: #223226;
 
+  --mustard-100: #fbe9d0;
   --mustard-300: #ecc873;
   --mustard-500: #d9a441;
   --mustard-700: #a67322;
@@ -14,6 +15,10 @@
   --ink: #223226;
   --ink-soft: #55655a;
   --line: #dde3d4;
+
+  --danger: #b03a2e;
+  --danger-100: #fde2dd;
+  --danger-300: #e89b90;
 
   --radius: 14px;
 }
@@ -144,7 +149,7 @@ a {
 }
 
 .pill-warn {
-  background: #fbe9d0;
+  background: var(--mustard-100);
   color: var(--mustard-700);
 }
 
@@ -284,7 +289,7 @@ input[type="number"] {
 }
 
 .texto-error {
-  color: #b03a2e;
+  color: var(--danger);
   margin-top: 12px;
   font-size: 0.9rem;
 }
@@ -529,8 +534,9 @@ input[type="number"] {
   font-size: 0.9rem;
 }
 
-.btn-borrar {
-  color: #b03a2e;
+.btn-borrar,
+.btn-peligro {
+  color: var(--danger);
   padding: 8px 12px;
 }
 
@@ -547,6 +553,24 @@ input[type="number"] {
   gap: 8px;
   z-index: 9999;
   pointer-events: none;
+}
+
+.toast-ok {
+  background: var(--sage-100);
+  color: var(--sage-700);
+  border: 1px solid var(--sage-300);
+}
+
+.toast-warn {
+  background: var(--mustard-100);
+  color: var(--mustard-700);
+  border: 1px solid var(--mustard-300);
+}
+
+.toast-error {
+  background: var(--danger-100);
+  color: var(--danger);
+  border: 1px solid var(--danger-300);
 }
 
 .toast {
@@ -614,7 +638,7 @@ input[type="number"] {
 /* Lista de compras                                              */
 /* ============================================================ */
 .card-comprar {
-  background: linear-gradient(180deg, white 0%, #fbe9d0 100%);
+  background: linear-gradient(180deg, white 0%, var(--mustard-100) 100%);
   border-color: var(--mustard-300);
 }
 
@@ -1079,7 +1103,25 @@ input[type="number"] {
     align-items: center;
   }
 
-  .toast {
+  .toast-ok {
+  background: var(--sage-100);
+  color: var(--sage-700);
+  border: 1px solid var(--sage-300);
+}
+
+.toast-warn {
+  background: var(--mustard-100);
+  color: var(--mustard-700);
+  border: 1px solid var(--mustard-300);
+}
+
+.toast-error {
+  background: var(--danger-100);
+  color: var(--danger);
+  border: 1px solid var(--danger-300);
+}
+
+.toast {
     width: 100%;
     text-align: center;
     max-width: none;

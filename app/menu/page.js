@@ -19,7 +19,7 @@ export default async function MenuPage() {
       <div>
         <h1>Menú de la semana</h1>
         <div className="card">
-          <p className="empty" style={{ color: "#b03a2e" }}>
+          <p className="empty texto-error">
             Error al cargar platillos: {errPlatillos.message}
           </p>
         </div>
