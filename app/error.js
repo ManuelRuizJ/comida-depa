@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { CircleAlert } from "lucide-react";
 
 export default function Error({ error, reset }) {
   return (
-    <div style={{ textAlign: "center", paddingTop: 40 }}>
-      <h1 style={{ fontSize: "2.2rem" }}>Algo se quemó 🔥</h1>
-      <p className="row-sub" style={{ marginBottom: 24 }}>
-        {error?.message || "Algo salió mal cargando esta página."}
-      </p>
-      <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+    <div className="pagina-aviso">
+      <CircleAlert size={28} aria-hidden="true" color="var(--danger)" />
+      <h1>No se pudo cargar esta página</h1>
+      <p>{error?.message || "Ocurrió un error inesperado."}</p>
+      <p>Si se repite, revisa la conexión con Supabase en la configuración del despliegue.</p>
+      <div className="form-acciones">
         <button onClick={() => reset()} className="btn btn-primary">
           Intentar de nuevo
         </button>
-        <Link href="/" className="btn btn-ghost">
-          Volver al inicio
+        <Link href="/" className="btn btn-secondary">
+          Ir al inicio
         </Link>
       </div>
     </div>
