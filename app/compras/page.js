@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BotonCompartirLista from "@/components/BotonCompartirLista";
 import { supabase } from "@/lib/supabase";
 import { DIAS_SEMANA } from "@/lib/fecha";
 import {
@@ -6,6 +7,7 @@ import {
   SELECT_MENU_COMPRAS,
   calcularCompras,
   formatearCantidad as fmt,
+  listaComoTexto,
 } from "@/lib/compras";
 
 export const dynamic = "force-dynamic";
@@ -51,10 +53,15 @@ export default async function ComprasPage() {
       {/* --- Resumen rápido --- */}
       {faltantes.length > 0 && (
         <div className="card card-comprar">
-          <h2 style={{ marginBottom: 4 }}>🛒 A comprar ({faltantes.length})</h2>
-          <p className="row-sub" style={{ marginBottom: 12 }}>
-            Lo que falta para cubrir todo el menú:
-          </p>
+          <div className="compras-head">
+            <div>
+              <h2 style={{ marginBottom: 4 }}>🛒 A comprar ({faltantes.length})</h2>
+              <p className="row-sub" style={{ margin: 0 }}>
+                Lo que falta para cubrir todo el menú:
+              </p>
+            </div>
+            <BotonCompartirLista texto={listaComoTexto(faltantes)} />
+          </div>
           {faltantes.map((item) => (
             <div className="row" key={item.id}>
               <div style={{ flex: 1, minWidth: 0 }}>
