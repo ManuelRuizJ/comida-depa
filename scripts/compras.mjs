@@ -41,7 +41,7 @@ async function main() {
     .join("");
 
   await enviarCorreo({
-    asunto: `🛒 Lista de compras (${porComprar.length} cosa${porComprar.length === 1 ? "" : "s"})`,
+    asunto: `Lista de compras (${porComprar.length} cosa${porComprar.length === 1 ? "" : "s"})`,
     html: plantilla({
       titulo: "Lista de compras de la semana",
       intro: "Calculada del menú de esta semana menos lo que ya tienen en el depa:",

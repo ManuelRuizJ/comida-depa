@@ -4,7 +4,7 @@ import { BASE_URL, boton, correr, enviarCorreo, plantilla } from "./lib/correo.m
 
 async function main() {
   await enviarCorreo({
-    asunto: "🍳 Arma el menú de la próxima semana",
+    asunto: "Arma el menú de la próxima semana",
     html: plantilla({
       titulo: "Arma el menú de la próxima semana",
       intro: "Es viernes, toca decidir qué van a comer la próxima semana en el depa.",
