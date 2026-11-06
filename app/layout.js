@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
 import BotonSalir from "@/components/BotonSalir";
+import NavLinks from "@/components/NavLinks";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -34,11 +35,7 @@ export default function RootLayout({ children }) {
               Cocina Depa
             </Link>
             <nav className="nav">
-              <Link href="/hoy">Hoy</Link>
-              <Link href="/menu">Menú</Link>
-              <Link href="/inventario">Inventario</Link>
-              <Link href="/compras">Compras</Link>
-              <Link href="/recetas">Recetas</Link>
+              <NavLinks />
               <BotonSalir />
             </nav>
           </header>

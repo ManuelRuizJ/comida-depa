@@ -94,6 +94,11 @@ a {
   border-bottom-color: var(--mustard-500);
 }
 
+.nav a[aria-current="page"] {
+  color: var(--sage-900);
+  border-bottom-color: var(--mustard-500);
+}
+
 .page {
   max-width: 720px;
   margin: 0 auto;
