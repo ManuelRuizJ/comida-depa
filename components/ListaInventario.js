@@ -68,7 +68,9 @@ export default function ListaInventario({ items, usosPorIngrediente }) {
       cantidad_minima: Number(valores[item.ingrediente_id].cantidad_minima),
     }));
 
-    if (lote.some((c) => !Number.isFinite(c.cantidad_actual) || !Number.isFinite(c.cantidad_minima))) {
+    if (
+      lote.some((c) => !Number.isFinite(c.cantidad_actual) || !Number.isFinite(c.cantidad_minima))
+    ) {
       toast("Hay cantidades vacías o que no son números.", "error");
       return;
     }
@@ -110,10 +112,18 @@ export default function ListaInventario({ items, usosPorIngrediente }) {
           />
         </label>
         <div className="segmented" role="group" aria-label="Filtrar">
-          <button type="button" aria-pressed={filtro === "todos"} onClick={() => setFiltro("todos")}>
+          <button
+            type="button"
+            aria-pressed={filtro === "todos"}
+            onClick={() => setFiltro("todos")}
+          >
             Todos<span className="conteo">{items.length}</span>
           </button>
-          <button type="button" aria-pressed={filtro === "faltantes"} onClick={() => setFiltro("faltantes")}>
+          <button
+            type="button"
+            aria-pressed={filtro === "faltantes"}
+            onClick={() => setFiltro("faltantes")}
+          >
             Por comprar<span className="conteo">{totalFaltantes}</span>
           </button>
         </div>
@@ -172,7 +182,11 @@ export default function ListaInventario({ items, usosPorIngrediente }) {
                 ? "1 cambio sin guardar"
                 : `${cambios.length} cambios sin guardar`}
           </span>
-          <button className="btn btn-ghost btn-sm" onClick={() => setValores(valoresDe(items))} disabled={guardando}>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setValores(valoresDe(items))}
+            disabled={guardando}
+          >
             Descartar
           </button>
           <button className="btn btn-primary btn-sm" onClick={guardarTodo} disabled={guardando}>

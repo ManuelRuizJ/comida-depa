@@ -103,7 +103,12 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    var(--font-body),
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -222,8 +227,8 @@ svg {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px
-    max(16px, env(safe-area-inset-left, 0px));
+  padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
+    10px max(16px, env(safe-area-inset-left, 0px));
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: saturate(1.4) blur(10px);
   border-bottom: 1px solid var(--border);
@@ -234,7 +239,8 @@ svg {
   max-width: var(--content-max);
   margin: 0 auto;
   padding: 20px max(16px, env(safe-area-inset-right, 0px))
-    calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
 }
 
 .tabbar {
@@ -244,7 +250,8 @@ svg {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
-  padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
+    env(safe-area-inset-left, 0px);
   background: var(--surface);
   border-top: 1px solid var(--border);
 }

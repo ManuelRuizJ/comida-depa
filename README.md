@@ -53,7 +53,7 @@ Abre `http://localhost:3000`.
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
    - `APP_PASSWORD` (la palabra clave para entrar)
-   (los mismos valores de tu `.env.local`)
+     (los mismos valores de tu `.env.local`)
 4. Dale "Deploy". En 1-2 minutos tienes una URL pública tipo `cocina-depa-web.vercel.app`.
 
 ## Acceso con palabra clave

@@ -32,7 +32,8 @@ export default async function ComprasPage() {
         <div>
           <h1>Lista de compras</h1>
           <p className="page-sub">
-            Lo que piden los platillos pendientes de la semana, menos lo que ya hay en el inventario.
+            Lo que piden los platillos pendientes de la semana, menos lo que ya hay en el
+            inventario.
           </p>
         </div>
         {faltantes.length > 0 && (
@@ -108,7 +109,9 @@ export default async function ComprasPage() {
                 </div>
 
                 {p.ingredientes.length === 0 ? (
-                  <p className="panel-body fila-sub">Esta receta no tiene ingredientes capturados.</p>
+                  <p className="panel-body fila-sub">
+                    Esta receta no tiene ingredientes capturados.
+                  </p>
                 ) : (
                   <ul className="lista">
                     {p.ingredientes.map((ing) => {
@@ -120,7 +123,10 @@ export default async function ComprasPage() {
                             {fmt(ing.total)}
                             <small>{ing.unidad}</small>
                             {p.veces > 1 && (
-                              <span className="por-vez num"> ({fmt(ing.por_vez)} × {p.veces})</span>
+                              <span className="por-vez num">
+                                {" "}
+                                ({fmt(ing.por_vez)} × {p.veces})
+                              </span>
                             )}
                           </span>
                           <span

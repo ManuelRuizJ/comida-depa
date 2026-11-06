@@ -27,7 +27,9 @@ export default function LoginForm({ next }) {
         return;
       }
       const data = await res.json().catch(() => ({}));
-      setError(res.status === 401 ? "Esa no es la palabra clave." : data.error || "No se pudo entrar.");
+      setError(
+        res.status === 401 ? "Esa no es la palabra clave." : data.error || "No se pudo entrar."
+      );
       setClave("");
     } catch {
       setError("Sin conexión. Revisa el internet e intenta de nuevo.");
@@ -81,7 +83,11 @@ export default function LoginForm({ next }) {
         </p>
       )}
 
-      <button type="submit" className="btn btn-primary btn-block" disabled={cargando || !clave.trim()}>
+      <button
+        type="submit"
+        className="btn btn-primary btn-block"
+        disabled={cargando || !clave.trim()}
+      >
         {cargando ? <span className="spinner" /> : "Entrar"}
       </button>
     </form>

@@ -24,8 +24,8 @@ export default async function RecetasPage() {
         <div>
           <h1>Recetas</h1>
           <p className="page-sub">
-            Cada receta dice qué ingredientes usa y cuánto. De aquí salen la lista de compras y lo que se
-            descuenta del inventario.
+            Cada receta dice qué ingredientes usa y cuánto. De aquí salen la lista de compras y lo
+            que se descuenta del inventario.
           </p>
         </div>
         <div className="page-acciones">

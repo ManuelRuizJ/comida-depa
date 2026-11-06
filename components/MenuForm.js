@@ -136,7 +136,9 @@ export default function MenuForm({ platillos, menuActual, hoy }) {
 
       {(hayCambios || guardando) && (
         <div className="guardar-bar" role="region" aria-label="Cambios sin guardar">
-          <span className="guardar-bar-texto">{guardando ? "Guardando…" : "Cambios sin guardar"}</span>
+          <span className="guardar-bar-texto">
+            {guardando ? "Guardando…" : "Cambios sin guardar"}
+          </span>
           <button
             className="btn btn-ghost btn-sm"
             onClick={() => setSeleccion(seleccionDe(menuActual))}

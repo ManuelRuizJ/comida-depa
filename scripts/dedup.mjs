@@ -32,9 +32,7 @@ async function main() {
   if (errIng) throw errIng;
 
   // 2. Cuántas recetas usan cada uno
-  const { data: usos } = await supabase
-    .from("receta_ingredientes")
-    .select("ingrediente_id");
+  const { data: usos } = await supabase.from("receta_ingredientes").select("ingrediente_id");
   const usosPorId = {};
   (usos || []).forEach((u) => {
     usosPorId[u.ingrediente_id] = (usosPorId[u.ingrediente_id] || 0) + 1;
@@ -55,8 +53,7 @@ async function main() {
   for (const grupo of duplicados) {
     grupo.sort((a, b) => {
       if (b.usos !== a.usos) return b.usos - a.usos;
-      if (a.nombre.length !== b.nombre.length)
-        return a.nombre.length - b.nombre.length;
+      if (a.nombre.length !== b.nombre.length) return a.nombre.length - b.nombre.length;
       return a.nombre.localeCompare(b.nombre);
     });
   }
@@ -71,9 +68,7 @@ async function main() {
       const perdedores = grupo.slice(1);
       console.log(`   * "${ganador.nombre}" (${ganador.unidad}, ${ganador.usos} usos) <- se queda`);
       for (const p of perdedores) {
-        console.log(
-          `     - fusionar "${p.nombre}" (${p.unidad}, ${p.usos} usos)`
-        );
+        console.log(`     - fusionar "${p.nombre}" (${p.unidad}, ${p.usos} usos)`);
       }
       console.log("");
     }
@@ -130,10 +125,7 @@ async function main() {
       await supabase.from("inventario").delete().eq("ingrediente_id", p.id);
 
       // Borrar ingrediente perdedor
-      const { error: errDel } = await supabase
-        .from("ingredientes")
-        .delete()
-        .eq("id", p.id);
+      const { error: errDel } = await supabase.from("ingredientes").delete().eq("id", p.id);
 
       if (errDel) {
         console.error(`   Error: ${errDel.message}`);
@@ -146,18 +138,12 @@ async function main() {
   if (BORRAR_HUERFANOS) {
     console.log("\nBorrando huérfanos...");
     for (const h of huerfanos) {
-      const { error } = await supabase
-        .from("inventario")
-        .delete()
-        .eq("ingrediente_id", h.id);
+      const { error } = await supabase.from("inventario").delete().eq("ingrediente_id", h.id);
       if (error) {
         console.error(`   Error en ${h.nombre}: ${error.message}`);
         continue;
       }
-      const { error: errDel } = await supabase
-        .from("ingredientes")
-        .delete()
-        .eq("id", h.id);
+      const { error: errDel } = await supabase.from("ingredientes").delete().eq("id", h.id);
       if (errDel) {
         console.error(`   Error en ${h.nombre}: ${errDel.message}`);
       } else {

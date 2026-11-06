@@ -60,7 +60,11 @@ export async function GET(request) {
 
   if (!id || comido === null) {
     return responder(
-      pagina({ titulo: "Enlace incompleto", texto: "Al enlace le faltan datos. Márcalo desde la app.", ok: false }),
+      pagina({
+        titulo: "Enlace incompleto",
+        texto: "Al enlace le faltan datos. Márcalo desde la app.",
+        ok: false,
+      }),
       400
     );
   }
@@ -69,14 +73,26 @@ export async function GET(request) {
 
   if (error) {
     return responder(
-      pagina({ titulo: "No se pudo guardar", texto: "Intenta de nuevo o márcalo desde la app.", ok: false }),
+      pagina({
+        titulo: "No se pudo guardar",
+        texto: "Intenta de nuevo o márcalo desde la app.",
+        ok: false,
+      }),
       500
     );
   }
 
   return responder(
     comido === "true"
-      ? pagina({ titulo: "Marcado como comido", texto: "Los ingredientes se descontaron del inventario.", ok: true })
-      : pagina({ titulo: "Marcado como pendiente", texto: "Puedes cambiar el plan de hoy desde el menú.", ok: true })
+      ? pagina({
+          titulo: "Marcado como comido",
+          texto: "Los ingredientes se descontaron del inventario.",
+          ok: true,
+        })
+      : pagina({
+          titulo: "Marcado como pendiente",
+          texto: "Puedes cambiar el plan de hoy desde el menú.",
+          ok: true,
+        })
   );
 }

@@ -92,7 +92,12 @@ export default function NuevoIngredienteForm({ onCerrar }) {
             <label className="field-label" htmlFor={`${id}-unidad`}>
               Unidad
             </label>
-            <select id={`${id}-unidad`} className="select" value={unidad} onChange={(e) => setUnidad(e.target.value)}>
+            <select
+              id={`${id}-unidad`}
+              className="select"
+              value={unidad}
+              onChange={(e) => setUnidad(e.target.value)}
+            >
               {UNIDADES.map((u) => (
                 <option key={u}>{u}</option>
               ))}

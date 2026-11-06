@@ -33,11 +33,15 @@ export default function RecetaForm({ receta, catalogo = [] }) {
   );
 
   function actualizarIngrediente(i, campo, valor) {
-    setIngredientes((prev) => prev.map((ing, idx) => (idx === i ? { ...ing, [campo]: valor } : ing)));
+    setIngredientes((prev) =>
+      prev.map((ing, idx) => (idx === i ? { ...ing, [campo]: valor } : ing))
+    );
   }
 
   function quitarFila(i) {
-    setIngredientes((prev) => (prev.length === 1 ? [filaVacia()] : prev.filter((_, idx) => idx !== i)));
+    setIngredientes((prev) =>
+      prev.length === 1 ? [filaVacia()] : prev.filter((_, idx) => idx !== i)
+    );
   }
 
   async function guardar(e) {
@@ -228,7 +232,13 @@ export default function RecetaForm({ receta, catalogo = [] }) {
         )}
         <div className="form-acciones">
           <button type="submit" className="btn btn-primary" disabled={guardando}>
-            {guardando ? <span className="spinner" /> : editando ? "Guardar cambios" : "Crear receta"}
+            {guardando ? (
+              <span className="spinner" />
+            ) : editando ? (
+              "Guardar cambios"
+            ) : (
+              "Crear receta"
+            )}
           </button>
           <button type="button" className="btn btn-ghost" onClick={() => router.push("/recetas")}>
             Cancelar

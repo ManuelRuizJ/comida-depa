@@ -33,7 +33,11 @@ export default function ItemHoy({ item }) {
     const { ajustados = 0 } = await res.json().catch(() => ({}));
     setComido(valor);
     if (ajustados > 0) {
-      toast(valor ? "Marcado como comido. Se descontó del inventario." : "De vuelta a pendiente. Se regresó al inventario.");
+      toast(
+        valor
+          ? "Marcado como comido. Se descontó del inventario."
+          : "De vuelta a pendiente. Se regresó al inventario."
+      );
     } else {
       toast(valor ? "Marcado como comido" : "De vuelta a pendiente");
     }
@@ -62,7 +66,11 @@ export default function ItemHoy({ item }) {
           {comido ? (
             <>
               <span className="badge badge-ok">Comido</span>
-              <button className="btn btn-ghost btn-sm" onClick={() => marcar(false)} disabled={cargando}>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => marcar(false)}
+                disabled={cargando}
+              >
                 {cargando ? <span className="spinner" /> : <Undo2 size={16} aria-hidden="true" />}
                 Deshacer
               </button>
@@ -72,7 +80,11 @@ export default function ItemHoy({ item }) {
               <Link href="/menu" className="btn btn-ghost btn-sm">
                 Cambiar
               </Link>
-              <button className="btn btn-primary btn-sm" onClick={() => marcar(true)} disabled={cargando}>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => marcar(true)}
+                disabled={cargando}
+              >
                 {cargando ? <span className="spinner" /> : <Check size={16} aria-hidden="true" />}
                 Lo comimos
               </button>
@@ -85,7 +97,8 @@ export default function ItemHoy({ item }) {
         <ul className="ingredientes-mini" aria-label={`Ingredientes de ${platillo?.nombre}`}>
           {ingredientes.map((ri, i) => (
             <li key={ri.ingredientes?.id ?? i}>
-              {ri.ingredientes?.nombre} <b>{fmt(ri.cantidad_requerida)}</b> {ri.ingredientes?.unidad}
+              {ri.ingredientes?.nombre} <b>{fmt(ri.cantidad_requerida)}</b>{" "}
+              {ri.ingredientes?.unidad}
             </li>
           ))}
         </ul>

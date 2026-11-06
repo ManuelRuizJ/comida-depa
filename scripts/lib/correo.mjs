@@ -9,9 +9,10 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
 
-export const BASE_URL = (
-  process.env.APP_URL || "https://comida-depa-rh8t.vercel.app"
-).replace(/\/$/, "");
+export const BASE_URL = (process.env.APP_URL || "https://comida-depa-rh8t.vercel.app").replace(
+  /\/$/,
+  ""
+);
 
 // Mismos colores que la app (tokens claros de app/globals.css).
 export const COLOR = {
