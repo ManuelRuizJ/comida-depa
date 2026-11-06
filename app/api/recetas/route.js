@@ -1,21 +1,28 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { DUPLICADO, errorJson, leerJson } from "@/lib/api";
 
 export async function POST(request) {
-  const body = await request.json();
-  const { nombre, categoria, tiempo, ingredientes } = body;
+  const body = await leerJson(request);
+  if (!body) return errorJson("Datos inválidos", 400);
+  const { categoria, tiempo, ingredientes } = body;
+  const nombre = String(body.nombre ?? "").trim();
 
-  if (!nombre || !nombre.trim()) {
+  if (!nombre) {
     return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
   }
 
-  // 1. Crear (o reusar si ya existe) el platillo
+  // 1. Crear el platillo. Antes era un upsert y, si el nombre ya existía,
+  // pisaba la receta guardada y le sumaba ingredientes sin avisar.
   const { data: platillo, error: errPlatillo } = await supabase
     .from("platillos")
-    .upsert({ nombre, categoria, tiempo_min: tiempo }, { onConflict: "nombre" })
+    .insert({ nombre, categoria, tiempo_min: tiempo })
     .select("id")
     .single();
 
+  if (errPlatillo?.code === DUPLICADO) {
+    return errorJson(`Ya existe una receta llamada "${nombre}". Edítala desde la lista.`, 409);
+  }
   if (errPlatillo) {
     return NextResponse.json({ error: errPlatillo.message }, { status: 500 });
   }

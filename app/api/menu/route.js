@@ -1,10 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { errorJson, leerJson } from "@/lib/api";
 import { DIAS_SEMANA } from "@/lib/fecha";
 
 export async function POST(request) {
-  const body = await request.json();
-  const { dias } = body;
+  const body = await leerJson(request);
+  const dias = body?.dias;
 
   if (!Array.isArray(dias)) {
     return NextResponse.json({ error: "Formato inválido" }, { status: 400 });

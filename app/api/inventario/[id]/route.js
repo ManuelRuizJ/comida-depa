@@ -1,17 +1,19 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { errorJson, leerJson } from "@/lib/api";
 
 // PATCH /api/inventario/[ingrediente_id]
 // Body: { cantidad_actual, cantidad_minima }
 export async function PATCH(request, { params }) {
   const { id } = params; // este es el ingrediente_id
-  const body = await request.json();
+  const body = await leerJson(request);
+  if (!body) return errorJson("Datos inválidos", 400);
   const { cantidad_actual, cantidad_minima } = body;
 
   const actualizada = Number(cantidad_actual);
   const minima = Number(cantidad_minima);
 
-  if (Number.isNaN(actualizada) || Number.isNaN(minima)) {
+  if (!Number.isFinite(actualizada) || !Number.isFinite(minima)) {
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   }
 
