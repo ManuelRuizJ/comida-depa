@@ -5,15 +5,20 @@ import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 import { CATEGORIAS_PLATILLO as CATEGORIAS, UNIDADES } from "@/lib/constantes";
 
-export default function RecetaForm() {
+const filaVacia = () => ({ nombre: "", cantidad: "", unidad: "piezas" });
+
+// Sirve para crear (sin `receta`) y para editar (con `receta`).
+export default function RecetaForm({ receta }) {
+  const editando = Boolean(receta?.id);
   const { toast } = useToast();
   const router = useRouter();
-  const [nombre, setNombre] = useState("");
-  const [categoria, setCategoria] = useState("Comida");
-  const [tiempo, setTiempo] = useState(20);
-  const [ingredientes, setIngredientes] = useState([
-    { nombre: "", cantidad: "", unidad: "piezas" },
-  ]);
+
+  const [nombre, setNombre] = useState(receta?.nombre ?? "");
+  const [categoria, setCategoria] = useState(receta?.categoria ?? "Comida");
+  const [tiempo, setTiempo] = useState(receta?.tiempo ?? 20);
+  const [ingredientes, setIngredientes] = useState(
+    receta?.ingredientes?.length ? receta.ingredientes : [filaVacia()]
+  );
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
 
@@ -26,14 +31,18 @@ export default function RecetaForm() {
   }
 
   function agregarFila() {
-    setIngredientes((prev) => [
-      ...prev,
-      { nombre: "", cantidad: "", unidad: "piezas" },
-    ]);
+    setIngredientes((prev) => [...prev, filaVacia()]);
   }
 
   function quitarFila(i) {
     setIngredientes((prev) => prev.filter((_, idx) => idx !== i));
+  }
+
+  function limpiar() {
+    setNombre("");
+    setCategoria("Comida");
+    setTiempo(20);
+    setIngredientes([filaVacia()]);
   }
 
   async function guardar(e) {
@@ -46,19 +55,19 @@ export default function RecetaForm() {
     }
 
     const ingredientesValidos = ingredientes.filter(
-      (i) => i.nombre.trim() && i.cantidad
+      (i) => i.nombre.trim() && Number(i.cantidad) > 0
     );
 
     setGuardando(true);
-    const res = await fetch("/api/recetas", {
-      method: "POST",
+    const res = await fetch(editando ? `/api/recetas/${receta.id}` : "/api/recetas", {
+      method: editando ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        nombre,
+        nombre: nombre.trim(),
         categoria,
-        tiempo: Number(tiempo),
+        tiempo: Number(tiempo) || null,
         ingredientes: ingredientesValidos.map((i) => ({
-          nombre: i.nombre,
+          nombre: i.nombre.trim(),
           cantidad: Number(i.cantidad),
           unidad: i.unidad,
         })),
@@ -72,15 +81,13 @@ export default function RecetaForm() {
       return;
     }
 
-    toast("Receta guardada");
-    setNombre("");
-    setTiempo(20);
-    setIngredientes([{ nombre: "", cantidad: "", unidad: "piezas" }]);
-    router.refresh();
-
-    setNombre("");
-    setTiempo(20);
-    setIngredientes([{ nombre: "", cantidad: "", unidad: "piezas" }]);
+    if (editando) {
+      toast("Cambios guardados");
+      router.push("/recetas");
+    } else {
+      toast("Receta guardada");
+      limpiar();
+    }
     router.refresh();
   }
 
@@ -99,10 +106,7 @@ export default function RecetaForm() {
       <div className="form-row-2">
         <div className="form-field">
           <label className="row-sub">Categoría</label>
-          <select
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
-          >
+          <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
             {CATEGORIAS.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -114,6 +118,7 @@ export default function RecetaForm() {
           <label className="row-sub">Tiempo (min)</label>
           <input
             type="number"
+            min="0"
             value={tiempo}
             onChange={(e) => setTiempo(e.target.value)}
           />
@@ -132,6 +137,8 @@ export default function RecetaForm() {
           />
           <input
             type="number"
+            min="0"
+            step="any"
             placeholder="Cant."
             value={ing.cantidad}
             onChange={(e) => actualizarIngrediente(i, "cantidad", e.target.value)}
@@ -142,16 +149,20 @@ export default function RecetaForm() {
             onChange={(e) => actualizarIngrediente(i, "unidad", e.target.value)}
             className="ing-unidad"
           >
-            {UNIDADES.map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
+            {/* Si el ingrediente ya tenía una unidad fuera de la lista, se respeta. */}
+            {(UNIDADES.includes(ing.unidad) ? UNIDADES : [ing.unidad, ...UNIDADES]).map(
+              (u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              )
+            )}
           </select>
           <button
             type="button"
             className="btn btn-ghost btn-quitar"
             onClick={() => quitarFila(i)}
+            aria-label="Quitar ingrediente"
           >
             ✕
           </button>
@@ -167,11 +178,27 @@ export default function RecetaForm() {
         + Ingrediente
       </button>
 
-      
-      <div style={{ marginTop: 20 }}>
+      {error && <p className="texto-error">{error}</p>}
+
+      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
         <button type="submit" className="btn btn-primary" disabled={guardando}>
-          {guardando ? <span className="spinner" /> : "Guardar receta"}
+          {guardando ? (
+            <span className="spinner" />
+          ) : editando ? (
+            "Guardar cambios"
+          ) : (
+            "Guardar receta"
+          )}
         </button>
+        {editando && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => router.push("/recetas")}
+          >
+            Cancelar
+          </button>
+        )}
       </div>
     </form>
   );

@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import RecetaEditForm from "@/components/RecetaEditForm";
+import RecetaForm from "@/components/RecetaForm";
 
 export const dynamic = "force-dynamic";
 
@@ -35,16 +35,14 @@ export default async function EditarRecetaPage({ params }) {
       </Link>
       <h1>Editar receta</h1>
       <div className="card">
-        <RecetaEditForm
-          id={platillo.id}
-          nombreInicial={platillo.nombre}
-          categoriaInicial={platillo.categoria || "Comida"}
-          tiempoInicial={platillo.tiempo_min || 20}
-          ingredientesIniciales={
-            ingredientes.length > 0
-              ? ingredientes
-              : [{ nombre: "", cantidad: "", unidad: "piezas" }]
-          }
+        <RecetaForm
+          receta={{
+            id: platillo.id,
+            nombre: platillo.nombre,
+            categoria: platillo.categoria || "Comida",
+            tiempo: platillo.tiempo_min || 20,
+            ingredientes,
+          }}
         />
       </div>
     </div>
