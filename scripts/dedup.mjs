@@ -23,7 +23,7 @@ function claveDuplicado(nombre) {
 }
 
 async function main() {
-  console.log(`🔍 Modo: ${APLICAR ? "APLICAR" : "reporte (dry-run)"}\n`);
+  console.log(`Modo: ${APLICAR ? "APLICAR" : "reporte (dry-run)"}\n`);
 
   // 1. Todos los ingredientes
   const { data: ingredientes, error: errIng } = await supabase
@@ -63,16 +63,16 @@ async function main() {
 
   // --- Reporte ---
   if (duplicados.length === 0) {
-    console.log("✅ No hay duplicados.");
+    console.log("No hay duplicados.");
   } else {
-    console.log(`📦 ${duplicados.length} grupo(s) de duplicados:\n`);
+    console.log(`${duplicados.length} grupo(s) de duplicados:\n`);
     for (const grupo of duplicados) {
       const ganador = grupo[0];
       const perdedores = grupo.slice(1);
-      console.log(`   ✓ "${ganador.nombre}" (${ganador.unidad}, ${ganador.usos} usos) ← ganador`);
+      console.log(`   * "${ganador.nombre}" (${ganador.unidad}, ${ganador.usos} usos) <- se queda`);
       for (const p of perdedores) {
         console.log(
-          `     → fusionar "${p.nombre}" (${p.unidad}, ${p.usos} usos)`
+          `     - fusionar "${p.nombre}" (${p.unidad}, ${p.usos} usos)`
         );
       }
       console.log("");
@@ -80,27 +80,27 @@ async function main() {
   }
 
   if (huerfanos.length > 0) {
-    console.log(`⚠️  ${huerfanos.length} ingrediente(s) sin ninguna receta:`);
+    console.log(`${huerfanos.length} ingrediente(s) sin ninguna receta:`);
     huerfanos.forEach((h) => console.log(`   - "${h.nombre}" (${h.unidad})`));
     console.log("");
   }
 
   // --- Aplicar ---
   if (!APLICAR) {
-    console.log("💡 Para aplicar los cambios:");
+    console.log("Para aplicar los cambios:");
     console.log("   node scripts/dedup.mjs --aplicar");
     console.log("   node scripts/dedup.mjs --aplicar --borrar-huerfanos");
     return;
   }
 
-  console.log("🚀 Aplicando cambios...\n");
+  console.log("Aplicando cambios...\n");
 
   for (const grupo of duplicados) {
     const ganador = grupo[0];
     const perdedores = grupo.slice(1);
 
     for (const p of perdedores) {
-      console.log(`🔀 "${p.nombre}" → "${ganador.nombre}"`);
+      console.log(`Fusionando "${p.nombre}" en "${ganador.nombre}"`);
 
       // Reasignar receta_ingredientes
       const { data: filasPerdedor } = await supabase
@@ -136,22 +136,22 @@ async function main() {
         .eq("id", p.id);
 
       if (errDel) {
-        console.error(`   ❌ Error: ${errDel.message}`);
+        console.error(`   Error: ${errDel.message}`);
       } else {
-        console.log(`   ✓ Listo`);
+        console.log(`   Listo`);
       }
     }
   }
 
   if (BORRAR_HUERFANOS) {
-    console.log("\n🗑️  Borrando huérfanos...");
+    console.log("\nBorrando huérfanos...");
     for (const h of huerfanos) {
       const { error } = await supabase
         .from("inventario")
         .delete()
         .eq("ingrediente_id", h.id);
       if (error) {
-        console.error(`   ❌ ${h.nombre}: ${error.message}`);
+        console.error(`   Error en ${h.nombre}: ${error.message}`);
         continue;
       }
       const { error: errDel } = await supabase
@@ -159,17 +159,17 @@ async function main() {
         .delete()
         .eq("id", h.id);
       if (errDel) {
-        console.error(`   ❌ ${h.nombre}: ${errDel.message}`);
+        console.error(`   Error en ${h.nombre}: ${errDel.message}`);
       } else {
-        console.log(`   ✓ "${h.nombre}" borrado`);
+        console.log(`   "${h.nombre}" borrado`);
       }
     }
   }
 
-  console.log("\n✅ Deduplicación completa.");
+  console.log("\nDeduplicación completa.");
 }
 
 main().catch((err) => {
-  console.error("❌ Error:", err);
+  console.error("Error:", err);
   process.exit(1);
 });

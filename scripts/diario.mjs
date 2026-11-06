@@ -33,7 +33,7 @@ async function main() {
         </div>
         ${
           item.comido
-            ? `<span style="color: ${COLOR.sage500}; font-weight: 500;">✓ Ya marcado como comido</span>`
+            ? `<span style="color: ${COLOR.sage500}; font-weight: 500;">Ya marcado como comido</span>`
             : boton(`${BASE_URL}/api/confirmar?id=${item.id}&comido=true`, "Sí, lo comí") +
               boton(`${BASE_URL}/menu`, "Cambié de plan", { secundario: true })
         }

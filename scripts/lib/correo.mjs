@@ -13,14 +13,14 @@ export const BASE_URL = (
   process.env.APP_URL || "https://comida-depa-rh8t.vercel.app"
 ).replace(/\/$/, "");
 
-// Mismos colores que la app (app/globals.css).
+// Mismos colores que la app (tokens claros de app/globals.css).
 export const COLOR = {
-  sage700: "#3f5636",
-  sage500: "#5f7a52",
-  ink: "#223226",
-  inkSoft: "#55655a",
-  line: "#dde3d4",
-  mustard700: "#a67322",
+  sage700: "#2e5b39",
+  sage500: "#2f6b3f",
+  ink: "#1a211c",
+  inkSoft: "#59635c",
+  line: "#e0e3db",
+  mustard700: "#855000",
 };
 
 const transporter = nodemailer.createTransport({
@@ -54,7 +54,7 @@ export function boton(href, texto, { secundario = false } = {}) {
     : `background: ${COLOR.sage700}; color: white; font-weight: 600;`;
   return `<a href="${href}"
      style="display: inline-block; ${estilo} text-decoration: none;
-            padding: 10px 18px; border-radius: 999px; margin: 4px 8px 4px 0;">
+            padding: 10px 18px; border-radius: 8px; margin: 4px 8px 4px 0;">
     ${texto}
   </a>`;
 }
@@ -62,8 +62,8 @@ export function boton(href, texto, { secundario = false } = {}) {
 // Envuelve el contenido con el encabezado y pie de todos los correos.
 export function plantilla({ titulo, intro, contenido = "" }) {
   return `
-    <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <h1 style="font-family: Georgia, serif; color: ${COLOR.ink}; font-size: 1.5rem;">
+    <div style="font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+      <h1 style="color: ${COLOR.ink}; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.01em;">
         ${titulo}
       </h1>
       ${intro ? `<p style="color: ${COLOR.inkSoft}; margin-bottom: 16px;">${intro}</p>` : ""}

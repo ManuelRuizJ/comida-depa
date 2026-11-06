@@ -436,7 +436,7 @@ async function asegurarInventario(ingredienteId, nombre) {
       { onConflict: "ingrediente_id", ignoreDuplicates: true }
     );
   if (error) throw error;
-  console.log(`  📦 Inventario listo para: ${nombre}`);
+  console.log(`  inventario listo: ${nombre}`);
 }
 
 async function getOrCreatePlatillo(nombre, categoria, tiempo) {
@@ -463,19 +463,19 @@ async function main() {
   for (const [nombrePlatillo, datos] of Object.entries(RECETAS)) {
     console.log(`\n=== ${nombrePlatillo} ===`);
     const platilloId = await getOrCreatePlatillo(nombrePlatillo, datos.categoria, datos.tiempo);
-    console.log(`🍽️  Platillo listo: ${nombrePlatillo}`);
+    console.log(`Platillo: ${nombrePlatillo}`);
 
     for (const [nombreIng, cantidad, unidad] of datos.ingredientes) {
       const ingredienteId = await getOrCreateIngrediente(nombreIng, unidad);
       await asegurarInventario(ingredienteId, nombreIng);
       await conectarReceta(platilloId, ingredienteId, cantidad);
-      console.log(`  🔗 Conectado: ${nombrePlatillo} - ${nombreIng} (${cantidad} ${unidad})`);
+      console.log(`  + ${nombrePlatillo} - ${nombreIng} (${cantidad} ${unidad})`);
     }
   }
-  console.log("\n✅ Carga completa. Ve a /inventario en tu sitio y pon las cantidades reales.");
+  console.log("\nCarga completa. Ve a /inventario en tu sitio y pon las cantidades reales.");
 }
 
 main().catch((err) => {
-  console.error("❌ Error:", err.message);
+  console.error("Error:", err.message);
   process.exit(1);
 });

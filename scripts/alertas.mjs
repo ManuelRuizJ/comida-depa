@@ -35,7 +35,7 @@ async function main() {
   const titulo = `${faltantes.length} cosa${faltantes.length === 1 ? "" : "s"} por comprar`;
 
   await enviarCorreo({
-    asunto: `🛒 ${titulo}`,
+    asunto: `Inventario: ${titulo}`,
     html: plantilla({
       titulo,
       intro: "Esto está por debajo del mínimo en el depa:",
