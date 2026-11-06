@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { diaDeHoy, esDiaLaborable } from "@/lib/fecha";
+import { necesitaComprar } from "@/lib/inventario";
 
 export default async function Home() {
   const hoy = diaDeHoy();
@@ -17,11 +18,9 @@ export default async function Home() {
 
   const { data: inventario } = await supabase
     .from("inventario_con_estado")
-    .select("estado");
+    .select("cantidad_actual, cantidad_minima");
 
-  const faltantes = (inventario || []).filter((i) =>
-    i.estado.includes("Comprar")
-  ).length;
+  const faltantes = (inventario || []).filter(necesitaComprar).length;
 
   const pendientes = itemsHoy.filter((i) => !i.comido).length;
 
