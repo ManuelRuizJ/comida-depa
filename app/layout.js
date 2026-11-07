@@ -1,4 +1,4 @@
-import { Public_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import Link from "next/link";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
@@ -6,11 +6,16 @@ import BotonSalir from "@/components/BotonSalir";
 import Navegacion from "@/components/Navegacion";
 import Logo from "@/components/Logo";
 
-const publicSans = Public_Sans({
-  subsets: ["latin"],
+// Public Sans variable (100-900), subconjunto latino. Se sirve desde el
+// proyecto para que el build no dependa de Google Fonts. Licencia OFL en
+// app/fonts/OFL-PublicSans.txt.
+const publicSans = localFont({
+  src: "./fonts/public-sans-latin-wght-normal.woff2",
+  weight: "100 900",
+  style: "normal",
   variable: "--font-body",
-  weight: ["400", "500", "600", "700"],
   display: "swap",
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
 });
 
 export const metadata = {
