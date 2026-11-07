@@ -1454,6 +1454,16 @@ svg {
   gap: 8px;
 }
 
+.ing-aviso {
+  grid-column: 1 / -1;
+  padding: 6px 10px;
+  border: 1px solid var(--warn-border);
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 0.8125rem;
+}
+
 @media (max-width: 519px) {
   .ing-encabezado {
     display: none;

@@ -4,14 +4,17 @@ import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CircleAlert, Plus, X } from "lucide-react";
 import { useToast } from "./ToastProvider";
-import { CATEGORIAS_PLATILLO as CATEGORIAS, UNIDADES } from "@/lib/constantes";
+import { CATEGORIAS_PLATILLO as CATEGORIAS, UNIDADES, normalizarUnidad } from "@/lib/constantes";
 import { claveNombre } from "@/lib/ingredientes";
 
-const filaVacia = () => ({ nombre: "", cantidad: "", unidad: "piezas" });
+// `unidadElegida`: la unidad se cambió a mano en el desplegable. Mientras no,
+// un ingrediente que ya existe muestra la unidad que tiene en el catálogo.
+const filaVacia = () => ({ nombre: "", cantidad: "", unidad: "piezas", unidadElegida: false });
 
 // Sirve para crear (sin `receta`) y para editar (con `receta`).
 // `catalogo` son los ingredientes que ya existen: se sugieren al escribir y,
-// si se elige uno, se usa su unidad (es la que lleva el inventario).
+// si se elige uno, se propone su unidad. Cambiarla aquí la cambia también en
+// el ingrediente (inventario y demás recetas), porque la unidad es del ingrediente.
 export default function RecetaForm({ receta, catalogo = [] }) {
   const editando = Boolean(receta?.id);
   const { toast } = useToast();
@@ -36,6 +39,12 @@ export default function RecetaForm({ receta, catalogo = [] }) {
     setIngredientes((prev) =>
       prev.map((ing, idx) => (idx === i ? { ...ing, [campo]: valor } : ing))
     );
+  }
+
+  // Unidad que se muestra y se guarda para una fila.
+  function unidadDeFila(ing) {
+    const existente = catalogoPorClave.get(claveNombre(ing.nombre));
+    return normalizarUnidad(ing.unidadElegida || !existente ? ing.unidad : existente.unidad);
   }
 
   function quitarFila(i) {
@@ -73,7 +82,7 @@ export default function RecetaForm({ receta, catalogo = [] }) {
         ingredientes: validos.map((i) => ({
           nombre: i.nombre.trim(),
           cantidad: Number(i.cantidad),
-          unidad: catalogoPorClave.get(claveNombre(i.nombre))?.unidad ?? i.unidad,
+          unidad: unidadDeFila(i),
         })),
       }),
     }).catch(() => null);
@@ -162,7 +171,8 @@ export default function RecetaForm({ receta, catalogo = [] }) {
           </div>
           {ingredientes.map((ing, i) => {
             const existente = catalogoPorClave.get(claveNombre(ing.nombre));
-            const unidad = existente?.unidad ?? ing.unidad;
+            const unidad = unidadDeFila(ing);
+            const cambiaUnidad = existente && unidad !== normalizarUnidad(existente.unidad);
             const n = i + 1;
             return (
               <div key={i} className="ing-fila">
@@ -189,10 +199,15 @@ export default function RecetaForm({ receta, catalogo = [] }) {
                 <select
                   className="select"
                   value={unidad}
-                  onChange={(e) => actualizarIngrediente(i, "unidad", e.target.value)}
-                  disabled={Boolean(existente)}
-                  title={existente ? "Unidad que usa el inventario" : undefined}
+                  onChange={(e) =>
+                    setIngredientes((prev) =>
+                      prev.map((fila, idx) =>
+                        idx === i ? { ...fila, unidad: e.target.value, unidadElegida: true } : fila
+                      )
+                    )
+                  }
                   aria-label={`Unidad del ingrediente ${n}`}
+                  aria-describedby={cambiaUnidad ? `${id}-aviso-${i}` : undefined}
                 >
                   {(UNIDADES.includes(unidad) ? UNIDADES : [unidad, ...UNIDADES]).map((u) => (
                     <option key={u}>{u}</option>
@@ -206,6 +221,12 @@ export default function RecetaForm({ receta, catalogo = [] }) {
                 >
                   <X size={16} aria-hidden="true" />
                 </button>
+                {cambiaUnidad && (
+                  <p id={`${id}-aviso-${i}`} className="ing-aviso">
+                    {existente.nombre} pasará de {normalizarUnidad(existente.unidad)} a {unidad} en
+                    el inventario y en las demás recetas. Revisa su cantidad en Inventario.
+                  </p>
+                )}
               </div>
             );
           })}
