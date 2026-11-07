@@ -1,58 +1,41 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { DUPLICADO, errorJson, leerJson } from "@/lib/api";
+import { limpiarNombre } from "@/lib/ingredientes";
+import { guardarIngredientesDeReceta } from "@/lib/recetas";
 
+// POST /api/recetas — crear una receta con sus ingredientes
 export async function POST(request) {
-  const body = await request.json();
-  const { nombre, categoria, tiempo, ingredientes } = body;
+  const body = await leerJson(request);
+  if (!body) return errorJson("Datos inválidos", 400);
 
-  if (!nombre || !nombre.trim()) {
-    return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
+  const { categoria, tiempo, ingredientes } = body;
+  const nombre = limpiarNombre(body.nombre);
+
+  if (!nombre) {
+    return errorJson("El nombre es obligatorio", 400);
   }
 
-  // 1. Crear (o reusar si ya existe) el platillo
+  // Antes era un upsert y, si el nombre ya existía, pisaba la receta
+  // guardada y le sumaba ingredientes sin avisar.
   const { data: platillo, error: errPlatillo } = await supabase
     .from("platillos")
-    .upsert({ nombre, categoria, tiempo_min: tiempo }, { onConflict: "nombre" })
+    .insert({ nombre, categoria, tiempo_min: tiempo })
     .select("id")
     .single();
 
+  if (errPlatillo?.code === DUPLICADO) {
+    return errorJson(`Ya existe una receta llamada "${nombre}". Edítala desde la lista.`, 409);
+  }
   if (errPlatillo) {
-    return NextResponse.json({ error: errPlatillo.message }, { status: 500 });
+    return errorJson(errPlatillo.message);
   }
 
-  // 2. Por cada ingrediente: crear si no existe, asegurar fila de inventario, conectar
-  for (const ing of ingredientes || []) {
-    const { data: ingrediente, error: errIng } = await supabase
-      .from("ingredientes")
-      .upsert({ nombre: ing.nombre, unidad: ing.unidad }, { onConflict: "nombre" })
-      .select("id")
-      .single();
-
-    if (errIng) {
-      return NextResponse.json({ error: errIng.message }, { status: 500 });
-    }
-
-    await supabase
-      .from("inventario")
-      .upsert(
-        { ingrediente_id: ingrediente.id, cantidad_actual: 0, cantidad_minima: 1 },
-        { onConflict: "ingrediente_id", ignoreDuplicates: true }
-      );
-
-    const { error: errReceta } = await supabase
-      .from("receta_ingredientes")
-      .upsert(
-        {
-          platillo_id: platillo.id,
-          ingrediente_id: ingrediente.id,
-          cantidad_requerida: ing.cantidad,
-        },
-        { onConflict: "platillo_id,ingrediente_id" }
-      );
-
-    if (errReceta) {
-      return NextResponse.json({ error: errReceta.message }, { status: 500 });
-    }
+  const errIngredientes = await guardarIngredientesDeReceta(platillo.id, ingredientes);
+  if (errIngredientes) {
+    // Sin ingredientes la receta quedaría a medias: mejor no dejarla.
+    await supabase.from("platillos").delete().eq("id", platillo.id);
+    return errorJson(errIngredientes.message);
   }
 
   return NextResponse.json({ ok: true, id: platillo.id });

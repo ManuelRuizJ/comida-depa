@@ -1,9 +1,13 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { errorJson, leerJson } from "@/lib/api";
+import { normalizarUnidad } from "@/lib/constantes";
+import { limpiarNombre } from "@/lib/ingredientes";
 
 // POST /api/inventario — crear un ingrediente nuevo
 export async function POST(request) {
-  const body = await request.json();
+  const body = await leerJson(request);
+  if (!body) return errorJson("Datos inválidos", 400);
   const { nombre, categoria, unidad, cantidad_actual, cantidad_minima } = body;
 
   if (!nombre || !nombre.trim()) {
@@ -18,9 +22,9 @@ export async function POST(request) {
     .from("ingredientes")
     .upsert(
       {
-        nombre: nombre.trim(),
+        nombre: limpiarNombre(nombre),
         categoria: categoria || null,
-        unidad: unidad.trim(),
+        unidad: normalizarUnidad(unidad),
       },
       { onConflict: "nombre" }
     )
@@ -31,17 +35,15 @@ export async function POST(request) {
     return NextResponse.json({ error: errIng.message }, { status: 500 });
   }
 
-  const { error: errInv } = await supabase
-    .from("inventario")
-    .upsert(
-      {
-        ingrediente_id: ingrediente.id,
-        cantidad_actual: Number(cantidad_actual) || 0,
-        cantidad_minima: Number(cantidad_minima) || 1,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "ingrediente_id" }
-    );
+  const { error: errInv } = await supabase.from("inventario").upsert(
+    {
+      ingrediente_id: ingrediente.id,
+      cantidad_actual: Number(cantidad_actual) || 0,
+      cantidad_minima: Number(cantidad_minima) || 1,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "ingrediente_id" }
+  );
 
   if (errInv) {
     return NextResponse.json({ error: errInv.message }, { status: 500 });
@@ -52,11 +54,21 @@ export async function POST(request) {
 
 // PATCH /api/inventario — guardar varios cambios de un jalón (batch)
 export async function PATCH(request) {
-  const body = await request.json();
-  const { cambios } = body;
+  const body = await leerJson(request);
+  const cambios = body?.cambios;
 
   if (!Array.isArray(cambios) || cambios.length === 0) {
     return NextResponse.json({ error: "Sin cambios" }, { status: 400 });
+  }
+
+  const invalido = cambios.some(
+    (c) =>
+      !c?.id ||
+      !Number.isFinite(Number(c.cantidad_actual)) ||
+      !Number.isFinite(Number(c.cantidad_minima))
+  );
+  if (invalido) {
+    return errorJson("Hay cantidades que no son números", 400);
   }
 
   const filas = cambios.map((c) => ({

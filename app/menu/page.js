@@ -1,41 +1,33 @@
 import { supabase } from "@/lib/supabase";
+import { diaDeHoy } from "@/lib/fecha";
 import MenuForm from "@/components/MenuForm";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Menú" };
 
 export default async function MenuPage() {
-  const { data: platillos, error: errPlatillos } = await supabase
-    .from("platillos")
-    .select("id, nombre, categoria")
-    .order("nombre");
+  const [{ data: platillos, error: errPlatillos }, { data: menuActual, error: errMenu }] =
+    await Promise.all([
+      supabase.from("platillos").select("id, nombre, categoria").order("nombre"),
+      supabase.from("menu_semana").select("id, dia, platillo_id, comido"),
+    ]);
 
-  const { data: menuActual } = await supabase
-    .from("menu_semana")
-    .select("id, dia, platillo_id, comido");
-
-  if (errPlatillos) {
-    return (
-      <div>
-        <h1>Menú de la semana</h1>
-        <div className="card">
-          <p className="empty" style={{ color: "#b03a2e" }}>
-            Error al cargar platillos: {errPlatillos.message}
-          </p>
-        </div>
-      </div>
-    );
+  if (errPlatillos || errMenu) {
+    throw new Error(`No se pudo cargar el menú: ${(errPlatillos || errMenu).message}`);
   }
 
   return (
-    <div>
-      <h1>Menú de la semana</h1>
-      <p className="row-sub">
-        Arma lo que van a comer de lunes a viernes. Puedes repetir platillos y
-        poner varios por día.
-      </p>
+    <>
+      <header className="page-head">
+        <div>
+          <h1>Menú de la semana</h1>
+          <p className="page-sub">
+            Lunes a viernes. Un día puede tener varios platillos y un platillo puede repetirse.
+          </p>
+        </div>
+      </header>
 
-      <MenuForm platillos={platillos || []} menuActual={menuActual || []} />
-    </div>
+      <MenuForm platillos={platillos} menuActual={menuActual} hoy={diaDeHoy()} />
+    </>
   );
 }

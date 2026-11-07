@@ -1,91 +1,94 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useId, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { useToast } from "./ToastProvider";
+import { necesitaComprar } from "@/lib/inventario";
 
-export default function FilaInventario({
-  item,
-  usos = 0,
-  valores,
-  onChange,
-  onBorrado,
-}) {
-  const router = useRouter();
+export default function FilaInventario({ item, usos = 0, valores, cambiado, onChange, onBorrado }) {
   const { toast } = useToast();
   const [borrando, setBorrando] = useState(false);
+  const id = useId();
 
-  const faltante = item.estado.includes("Comprar");
-  const cambiado =
-    Number(valores.cantidad_actual) !== Number(item.cantidad_actual) ||
-    Number(valores.cantidad_minima) !== Number(item.cantidad_minima);
+  const faltante = necesitaComprar(item);
 
   async function borrar() {
     let mensaje = `¿Borrar "${item.nombre}" del inventario?`;
     if (usos > 0) {
-      mensaje += `\n\n⚠️ Está usado en ${usos} receta(s). También se quitará de ahí.`;
+      mensaje += `\n\nSe usa en ${usos === 1 ? "1 receta" : `${usos} recetas`} y también se quitará de ahí.`;
     }
-    if (!confirm(mensaje)) return;
+    if (!window.confirm(mensaje)) return;
 
     setBorrando(true);
-    const res = await fetch(`/api/inventario/${item.ingrediente_id}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(`/api/inventario/${item.ingrediente_id}`, { method: "DELETE" }).catch(
+      () => null
+    );
     setBorrando(false);
 
-    if (!res.ok) {
-      toast("No se pudo borrar", "error");
+    if (!res?.ok) {
+      toast(`No se pudo borrar "${item.nombre}".`, "error");
       return;
     }
-
     toast(`"${item.nombre}" borrado`, "warn");
     onBorrado?.();
   }
 
   return (
-    <div className={`fila-inventario ${cambiado ? "fila-cambiada" : ""}`}>
-      <div className="fila-info">
-        <div className="row-name">{item.nombre}</div>
-        <div className="row-sub">
-          {item.unidad}
-          {usos > 0 && ` · ${usos} receta${usos === 1 ? "" : "s"}`}
-          {cambiado && <span className="badge-sin-guardar"> · sin guardar</span>}
-        </div>
-      </div>
-
-      <div className="fila-controles">
-        <span className={`pill ${faltante ? "pill-warn" : "pill-ok"}`}>
-          {item.estado}
+    <div className="inv-fila" data-cambiado={cambiado}>
+      <div className="inv-nombre fila-texto">
+        <span className="fila-titulo" id={`${id}-nombre`}>
+          {item.nombre}
         </span>
-
-        <div className="inv-inputs">
-          <label className="inv-input">
-            <span className="inv-label">Tienes</span>
-            <input
-              type="number"
-              value={valores.cantidad_actual}
-              onChange={(e) => onChange("cantidad_actual", e.target.value)}
-            />
-          </label>
-          <label className="inv-input">
-            <span className="inv-label">Mínimo</span>
-            <input
-              type="number"
-              value={valores.cantidad_minima}
-              onChange={(e) => onChange("cantidad_minima", e.target.value)}
-            />
-          </label>
-        </div>
-
-        <button
-          className="btn btn-ghost btn-borrar"
-          onClick={borrar}
-          disabled={borrando}
-          aria-label="Borrar"
-        >
-          {borrando ? "..." : "✕"}
-        </button>
+        <span className="fila-sub">
+          {item.unidad}
+          {usos > 0 && ` · ${usos === 1 ? "1 receta" : `${usos} recetas`}`}
+          {cambiado && <span className="sin-guardar"> · sin guardar</span>}
+        </span>
       </div>
+
+      <span className={`inv-estado badge ${faltante ? "badge-warn" : "badge-ok"}`}>
+        {faltante ? "Comprar" : "Disponible"}
+      </span>
+
+      <div className="inv-cantidades">
+        <label className="inv-campo">
+          <span>Hay</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="any"
+            className="input input-num"
+            value={valores.cantidad_actual}
+            onChange={(e) => onChange("cantidad_actual", e.target.value)}
+            aria-label={`Cantidad de ${item.nombre} en ${item.unidad}`}
+          />
+        </label>
+        <label className="inv-campo">
+          <span>Mínimo</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="any"
+            className="input input-num"
+            value={valores.cantidad_minima}
+            onChange={(e) => onChange("cantidad_minima", e.target.value)}
+            aria-label={`Mínimo de ${item.nombre} en ${item.unidad}`}
+          />
+        </label>
+      </div>
+
+      <button
+        type="button"
+        className="inv-borrar btn btn-ghost btn-peligro btn-icon"
+        onClick={borrar}
+        disabled={borrando}
+        aria-label={`Borrar ${item.nombre}`}
+        title="Borrar"
+      >
+        {borrando ? <span className="spinner" /> : <Trash2 size={16} aria-hidden="true" />}
+      </button>
     </div>
   );
 }

@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CircleAlert } from "lucide-react";
 import { useToast } from "./ToastProvider";
+import { CATEGORIAS_INGREDIENTE as CATEGORIAS, UNIDADES } from "@/lib/constantes";
 
-const UNIDADES = ["piezas", "gramos", "ml", "litros", "latas", "rebanadas", "diente"];
-const CATEGORIAS = ["Verdura", "Proteína", "Lácteo", "Abarrotes", "Condimento", "Otro"];
-
-export default function NuevoIngredienteForm() {
+export default function NuevoIngredienteForm({ onCerrar }) {
   const { toast } = useToast();
   const router = useRouter();
-  const [abierto, setAbierto] = useState(false);
+  const id = useId();
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("Abarrotes");
   const [unidad, setUnidad] = useState("piezas");
@@ -24,7 +23,7 @@ export default function NuevoIngredienteForm() {
     setError("");
 
     if (!nombre.trim()) {
-      setError("Ponle nombre al ingrediente.");
+      setError("Escribe el nombre del ingrediente.");
       return;
     }
 
@@ -39,102 +38,125 @@ export default function NuevoIngredienteForm() {
         cantidad_actual: Number(cantidadActual) || 0,
         cantidad_minima: Number(cantidadMinima) || 1,
       }),
-    });
+    }).catch(() => null);
     setGuardando(false);
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      toast(data.error || "Algo falló al guardar", "error");
+    if (!res?.ok) {
+      const data = await res?.json().catch(() => ({}));
+      setError(data?.error || "No se pudo guardar. Intenta de nuevo.");
       return;
     }
 
-    toast(`"${nombre}" agregado al inventario`);
-    setNombre("");
-    setCategoria("Abarrotes");
-    setUnidad("piezas");
-    setCantidadActual(0);
-    setCantidadMinima(1);
-    setAbierto(false);
+    toast(`"${nombre.trim()}" agregado al inventario`);
+    onCerrar();
     router.refresh();
   }
 
-  if (!abierto) {
-    return (
-      <button className="btn btn-secondary" onClick={() => setAbierto(true)}>
-        + Agregar ingrediente
-      </button>
-    );
-  }
-
   return (
-    <form onSubmit={guardar}>
-      <div className="form-field">
-        <label className="row-sub">Nombre</label>
-        <input
-          type="text"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          placeholder="ej. Jitomate"
-          autoFocus
-        />
+    <form className="panel form-nuevo" onSubmit={guardar}>
+      <div className="panel-head">
+        <h2>Nuevo ingrediente</h2>
       </div>
-
-      <div className="form-row-2">
-        <div className="form-field">
-          <label className="row-sub">Categoría</label>
-          <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-            {CATEGORIAS.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-        <div className="form-field">
-          <label className="row-sub">Unidad</label>
-          <select value={unidad} onChange={(e) => setUnidad(e.target.value)}>
-            {UNIDADES.map((u) => (
-              <option key={u} value={u}>{u}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="form-row-2">
-        <div className="form-field">
-          <label className="row-sub">Tienes ahora</label>
+      <div className="panel-body fields">
+        <div className="field">
+          <label className="field-label" htmlFor={`${id}-nombre`}>
+            Nombre
+          </label>
           <input
-            type="number"
-            value={cantidadActual}
-            onChange={(e) => setCantidadActual(e.target.value)}
+            id={`${id}-nombre`}
+            className="input"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            placeholder="Ej. Jitomate"
+            autoFocus
           />
         </div>
-        <div className="form-field">
-          <label className="row-sub">Mínimo (alerta)</label>
-          <input
-            type="number"
-            value={cantidadMinima}
-            onChange={(e) => setCantidadMinima(e.target.value)}
-          />
+
+        <div className="fields-2">
+          <div className="field">
+            <label className="field-label" htmlFor={`${id}-categoria`}>
+              Categoría
+            </label>
+            <select
+              id={`${id}-categoria`}
+              className="select"
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+            >
+              {CATEGORIAS.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor={`${id}-unidad`}>
+              Unidad
+            </label>
+            <select
+              id={`${id}-unidad`}
+              className="select"
+              value={unidad}
+              onChange={(e) => setUnidad(e.target.value)}
+            >
+              {UNIDADES.map((u) => (
+                <option key={u}>{u}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
 
-      {error && (
-        <p style={{ color: "#b03a2e", marginTop: 12, fontSize: "0.9rem" }}>{error}</p>
-      )}
+        <div className="fields-2">
+          <div className="field">
+            <label className="field-label" htmlFor={`${id}-actual`}>
+              Hay ahora
+            </label>
+            <input
+              id={`${id}-actual`}
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="any"
+              className="input input-num"
+              value={cantidadActual}
+              onChange={(e) => setCantidadActual(e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor={`${id}-minima`}>
+              Mínimo
+            </label>
+            <input
+              id={`${id}-minima`}
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="any"
+              className="input input-num"
+              value={cantidadMinima}
+              onChange={(e) => setCantidadMinima(e.target.value)}
+              aria-describedby={`${id}-minima-ayuda`}
+            />
+            <span className="field-ayuda" id={`${id}-minima-ayuda`}>
+              Con esto o menos aparece en &quot;Por comprar&quot;.
+            </span>
+          </div>
+        </div>
 
-      <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
-        <button type="submit" className="btn btn-primary" disabled={guardando}>
-          {guardando ? <span className="spinner" /> : "Agregar"}
-        </button>
-        <button
-          type="button"
-          className="btn btn-ghost"
-          onClick={() => {
-            setAbierto(false);
-            setError("");
-          }}
-        >
-          Cancelar
-        </button>
+        {error && (
+          <p className="texto-error" role="alert">
+            <CircleAlert size={16} aria-hidden="true" />
+            {error}
+          </p>
+        )}
+
+        <div className="form-acciones">
+          <button type="submit" className="btn btn-primary" disabled={guardando}>
+            {guardando ? <span className="spinner" /> : "Agregar"}
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={onCerrar}>
+            Cancelar
+          </button>
+        </div>
       </div>
     </form>
   );

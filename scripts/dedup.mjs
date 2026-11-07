@@ -1,12 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-
-dotenv.config({ path: ".env.local" });
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+import { supabase } from "./lib/supabase.mjs";
 
 const APLICAR = process.argv.includes("--aplicar");
 const BORRAR_HUERFANOS = process.argv.includes("--borrar-huerfanos");
@@ -31,7 +23,7 @@ function claveDuplicado(nombre) {
 }
 
 async function main() {
-  console.log(`🔍 Modo: ${APLICAR ? "APLICAR" : "reporte (dry-run)"}\n`);
+  console.log(`Modo: ${APLICAR ? "APLICAR" : "reporte (dry-run)"}\n`);
 
   // 1. Todos los ingredientes
   const { data: ingredientes, error: errIng } = await supabase
@@ -40,9 +32,7 @@ async function main() {
   if (errIng) throw errIng;
 
   // 2. Cuántas recetas usan cada uno
-  const { data: usos } = await supabase
-    .from("receta_ingredientes")
-    .select("ingrediente_id");
+  const { data: usos } = await supabase.from("receta_ingredientes").select("ingrediente_id");
   const usosPorId = {};
   (usos || []).forEach((u) => {
     usosPorId[u.ingrediente_id] = (usosPorId[u.ingrediente_id] || 0) + 1;
@@ -63,52 +53,49 @@ async function main() {
   for (const grupo of duplicados) {
     grupo.sort((a, b) => {
       if (b.usos !== a.usos) return b.usos - a.usos;
-      if (a.nombre.length !== b.nombre.length)
-        return a.nombre.length - b.nombre.length;
+      if (a.nombre.length !== b.nombre.length) return a.nombre.length - b.nombre.length;
       return a.nombre.localeCompare(b.nombre);
     });
   }
 
   // --- Reporte ---
   if (duplicados.length === 0) {
-    console.log("✅ No hay duplicados.");
+    console.log("No hay duplicados.");
   } else {
-    console.log(`📦 ${duplicados.length} grupo(s) de duplicados:\n`);
+    console.log(`${duplicados.length} grupo(s) de duplicados:\n`);
     for (const grupo of duplicados) {
       const ganador = grupo[0];
       const perdedores = grupo.slice(1);
-      console.log(`   ✓ "${ganador.nombre}" (${ganador.unidad}, ${ganador.usos} usos) ← ganador`);
+      console.log(`   * "${ganador.nombre}" (${ganador.unidad}, ${ganador.usos} usos) <- se queda`);
       for (const p of perdedores) {
-        console.log(
-          `     → fusionar "${p.nombre}" (${p.unidad}, ${p.usos} usos)`
-        );
+        console.log(`     - fusionar "${p.nombre}" (${p.unidad}, ${p.usos} usos)`);
       }
       console.log("");
     }
   }
 
   if (huerfanos.length > 0) {
-    console.log(`⚠️  ${huerfanos.length} ingrediente(s) sin ninguna receta:`);
+    console.log(`${huerfanos.length} ingrediente(s) sin ninguna receta:`);
     huerfanos.forEach((h) => console.log(`   - "${h.nombre}" (${h.unidad})`));
     console.log("");
   }
 
   // --- Aplicar ---
   if (!APLICAR) {
-    console.log("💡 Para aplicar los cambios:");
+    console.log("Para aplicar los cambios:");
     console.log("   node scripts/dedup.mjs --aplicar");
     console.log("   node scripts/dedup.mjs --aplicar --borrar-huerfanos");
     return;
   }
 
-  console.log("🚀 Aplicando cambios...\n");
+  console.log("Aplicando cambios...\n");
 
   for (const grupo of duplicados) {
     const ganador = grupo[0];
     const perdedores = grupo.slice(1);
 
     for (const p of perdedores) {
-      console.log(`🔀 "${p.nombre}" → "${ganador.nombre}"`);
+      console.log(`Fusionando "${p.nombre}" en "${ganador.nombre}"`);
 
       // Reasignar receta_ingredientes
       const { data: filasPerdedor } = await supabase
@@ -138,46 +125,37 @@ async function main() {
       await supabase.from("inventario").delete().eq("ingrediente_id", p.id);
 
       // Borrar ingrediente perdedor
-      const { error: errDel } = await supabase
-        .from("ingredientes")
-        .delete()
-        .eq("id", p.id);
+      const { error: errDel } = await supabase.from("ingredientes").delete().eq("id", p.id);
 
       if (errDel) {
-        console.error(`   ❌ Error: ${errDel.message}`);
+        console.error(`   Error: ${errDel.message}`);
       } else {
-        console.log(`   ✓ Listo`);
+        console.log(`   Listo`);
       }
     }
   }
 
   if (BORRAR_HUERFANOS) {
-    console.log("\n🗑️  Borrando huérfanos...");
+    console.log("\nBorrando huérfanos...");
     for (const h of huerfanos) {
-      const { error } = await supabase
-        .from("inventario")
-        .delete()
-        .eq("ingrediente_id", h.id);
+      const { error } = await supabase.from("inventario").delete().eq("ingrediente_id", h.id);
       if (error) {
-        console.error(`   ❌ ${h.nombre}: ${error.message}`);
+        console.error(`   Error en ${h.nombre}: ${error.message}`);
         continue;
       }
-      const { error: errDel } = await supabase
-        .from("ingredientes")
-        .delete()
-        .eq("id", h.id);
+      const { error: errDel } = await supabase.from("ingredientes").delete().eq("id", h.id);
       if (errDel) {
-        console.error(`   ❌ ${h.nombre}: ${errDel.message}`);
+        console.error(`   Error en ${h.nombre}: ${errDel.message}`);
       } else {
-        console.log(`   ✓ "${h.nombre}" borrado`);
+        console.log(`   "${h.nombre}" borrado`);
       }
     }
   }
 
-  console.log("\n✅ Deduplicación completa.");
+  console.log("\nDeduplicación completa.");
 }
 
 main().catch((err) => {
-  console.error("❌ Error:", err);
+  console.error("Error:", err);
   process.exit(1);
 });

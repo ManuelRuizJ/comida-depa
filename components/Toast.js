@@ -1,36 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
+import { CircleAlert, CircleCheck, TriangleAlert } from "lucide-react";
 
-const COLORES = {
-  ok: { bg: "#e2e8d9", color: "#3f5636", border: "#a9bd97" },
-  warn: { bg: "#fbe9d0", color: "#a67322", border: "#ecc873" },
-  error: { bg: "#fde2dd", color: "#b03a2e", border: "#e89b90" },
-};
+const ICONOS = { ok: CircleCheck, warn: TriangleAlert, error: CircleAlert };
 
 export default function Toast({ id, mensaje, tipo = "ok", onClose }) {
   useEffect(() => {
-    const t = setTimeout(() => onClose(id), 3000);
+    const t = setTimeout(() => onClose(id), tipo === "error" ? 6000 : 3500);
     return () => clearTimeout(t);
-  }, [id, onClose]);
+  }, [id, tipo, onClose]);
 
-  const c = COLORES[tipo] || COLORES.ok;
+  const clase = ICONOS[tipo] ? tipo : "ok";
+  const Icono = ICONOS[clase];
 
   return (
     <div
-      className="toast"
-      style={{
-        background: c.bg,
-        color: c.color,
-        border: `1px solid ${c.border}`,
-      }}
+      className={`toast toast-${clase}`}
       onClick={() => onClose(id)}
-      role="status"
+      role={clase === "error" ? "alert" : "status"}
     >
-      {tipo === "ok" && "✓ "}
-      {tipo === "warn" && "⚠ "}
-      {tipo === "error" && "✕ "}
-      {mensaje}
+      <Icono size={18} aria-hidden="true" />
+      <span>{mensaje}</span>
     </div>
   );
 }
